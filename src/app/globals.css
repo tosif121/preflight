@@ -7,9 +7,10 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-karla);
+  --font-serif: var(--font-playfair-sc);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-playfair-sc);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);

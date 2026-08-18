@@ -125,11 +125,11 @@ export default function LandingHero() {
 
               <div className="space-y-3 mb-6">
                 {[
-                  { label: "Name Consistency", color: "bg-[#4A7A59]" },
-                  { label: "Address Consistency", color: "bg-[#4A7A59]" },
+                  { label: "Name Consistency", color: "bg-[#C85A40]" },
                   { label: "Income Coverage", color: "bg-[#C85A40]" },
-                  { label: "Document Quality", color: "bg-[#F59E0B]" },
-                ].map((item, i) => (
+                  { label: "Address Consistency", color: "bg-[#F59E0B]" },
+                  { label: "Document Quality", color: "bg-[#4A7A59]" },
+                ].map((item) => (
                   <div
                     key={item.label}
                     className="flex items-center justify-between p-3 rounded-lg border border-[#EAE5DC] bg-white"
@@ -149,7 +149,7 @@ export default function LandingHero() {
                   Readiness
                 </span>
                 <span className="text-sm font-bold text-[#C85A40]">
-                  2/4 — 1 blocker
+                  12/14 — 2 blockers
                 </span>
               </div>
             </div>
