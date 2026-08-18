@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" fill="none">
+  <rect width="400" height="260" rx="8" fill="#f0f4ff" stroke="#3366cc" stroke-width="2"/>
+  <rect x="16" y="16" width="368" height="228" rx="4" fill="white" stroke="#ccc"/>
+  <text x="200" y="45" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="#1a3366">GOVERNMENT OF RAJASTHAN</text>
+  <text x="200" y="65" text-anchor="middle" font-family="Arial" font-size="12" fill="#666">Unique Identification — IDENTITY PROOF</text>
+  <line x1="30" y1="80" x2="370" y2="80" stroke="#3366cc" stroke-width="1"/>
+  <text x="30" y="105" font-family="Arial" font-size="11" fill="#333">Name: Ramesh Kumar Sharma</text>
+  <text x="30" y="125" font-family="Arial" font-size="11" fill="#333">DOB: 15/03/1985</text>
+  <text x="30" y="145" font-family="Arial" font-size="11" fill="#333">Gender: Male</text>
+  <text x="30" y="165" font-family="Arial" font-size="11" fill="#333">Address: 12, Nehru Nagar, Jaipur, Rajasthan, 302001</text>
+  <text x="30" y="195" font-family="Arial" font-size="11" fill="#333">ID No: XXXX XXXX 1234</text>
+  <rect x="280" y="100" width="80" height="100" rx="4" fill="#e8e8e8" stroke="#999"/>
+  <text x="320" y="155" text-anchor="middle" font-family="Arial" font-size="9" fill="#666">PHOTO</text>
+  <text x="200" y="238" text-anchor="middle" font-family="Arial" font-size="10" fill="#cc0000" font-weight="bold">SAMPLE — SYNTHETIC DOCUMENT</text>
+</svg>

@@ -1,0 +1,69 @@
+{
+  "id": "rj_family_income_certificate",
+  "name": "Rajasthan Family Income Certificate",
+  "version": "1.0",
+  "state": "rajasthan",
+  "prerequisites": [
+    "Jan Aadhaar family record must be available",
+    "All earning family members must have income proof"
+  ],
+  "required_documents": [
+    {
+      "doc_type": "identity_proof",
+      "scope": "per_member",
+      "description": "Aadhaar or equivalent identity proof for each family member"
+    },
+    {
+      "doc_type": "address_proof",
+      "scope": "per_application",
+      "description": "Address proof (utility bill, rent agreement, or address on Aadhaar)"
+    },
+    {
+      "doc_type": "income_proof_salaried",
+      "scope": "per_earning_member",
+      "description": "Salary slip, Form 16, or employer letter for salaried earning members"
+    },
+    {
+      "doc_type": "income_proof_nonsalaried",
+      "scope": "per_earning_member",
+      "description": "ITR, bank statement, or self-declaration for non-salaried earning members"
+    },
+    {
+      "doc_type": "photo",
+      "scope": "per_application",
+      "description": "Passport-size photo of the primary applicant"
+    }
+  ],
+  "cross_checks": [
+    {
+      "id": "name_consistency",
+      "severity": "blocker",
+      "description": "Name on identity proof must match name on income proof and application",
+      "check_type": "consistency"
+    },
+    {
+      "id": "address_consistency",
+      "severity": "warning",
+      "description": "Address on identity proof should match address proof",
+      "check_type": "consistency"
+    },
+    {
+      "id": "income_coverage",
+      "severity": "blocker",
+      "description": "Every earning family member must have at least one income proof document",
+      "check_type": "completeness"
+    },
+    {
+      "id": "certificate_use_by_date",
+      "severity": "blocker",
+      "description": "Intended use deadline must fall within 12 months from today",
+      "check_type": "validity"
+    },
+    {
+      "id": "document_quality",
+      "severity": "warning",
+      "description": "Document OCR confidence should be above 0.75 for reliable extraction",
+      "check_type": "quality"
+    }
+  ]
+}

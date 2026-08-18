@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 280" fill="none">
+  <rect width="400" height="280" rx="8" fill="#f8f5f0" stroke="#8b6914" stroke-width="2"/>
+  <rect x="16" y="16" width="368" height="248" rx="4" fill="white" stroke="#ccc"/>
+  <text x="200" y="42" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold" fill="#4a3510">INCOME TAX RETURN</text>
+  <text x="200" y="60" text-anchor="middle" font-family="Arial" font-size="11" fill="#666">Income Proof — Non-Salaried (ITR Acknowledgement)</text>
+  <line x1="30" y1="72" x2="370" y2="72" stroke="#8b6914" stroke-width="1"/>
+  <text x="30" y="95" font-family="Arial" font-size="11" fill="#333">Assessee: Priya Sharma</text>
+  <text x="30" y="115" font-family="Arial" font-size="11" fill="#333">PAN: XXXXX1234Y</text>
+  <text x="30" y="135" font-family="Arial" font-size="11" fill="#333">Assessment Year: 2026-27</text>
+  <text x="30" y="155" font-family="Arial" font-size="11" fill="#333">Income from Business/Profession: ₹2,40,000</text>
+  <text x="30" y="175" font-family="Arial" font-size="11" fill="#333">Total Income: ₹2,40,000</text>
+  <text x="30" y="195" font-family="Arial" font-size="11" fill="#333">Tax Payable: ₹0 (below taxable limit)</text>
+  <text x="30" y="215" font-family="Arial" font-size="10" fill="#888">Filed via: Income Tax e-Filing Portal</text>
+  <text x="200" y="268" text-anchor="middle" font-family="Arial" font-size="10" fill="#cc0000" font-weight="bold">SAMPLE — SYNTHETIC DOCUMENT</text>
+</svg>

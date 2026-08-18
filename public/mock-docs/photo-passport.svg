@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 260" fill="none">
+  <rect width="200" height="260" rx="4" fill="white" stroke="#ccc" stroke-width="2"/>
+  <rect x="16" y="16" width="168" height="180" rx="4" fill="#e8e8e8" stroke="#999"/>
+  <circle cx="100" cy="90" r="40" fill="#d0d0d0"/>
+  <circle cx="100" cy="78" r="18" fill="#bbb"/>
+  <ellipse cx="100" cy="130" rx="28" ry="22" fill="#bbb"/>
+  <text x="100" y="220" text-anchor="middle" font-family="Arial" font-size="10" fill="#333">Ramesh Kumar Sharma</text>
+  <text x="100" y="240" text-anchor="middle" font-family="Arial" font-size="9" fill="#666">Passport Size Photo</text>
+  <text x="100" y="256" text-anchor="middle" font-family="Arial" font-size="8" fill="#cc0000" font-weight="bold">SAMPLE — SYNTHETIC</text>
+</svg>
