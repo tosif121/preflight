@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -15,7 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Trash2, PlusCircle, ArrowRight, Lock } from "lucide-react";
+import { Trash2, PlusCircle, ArrowRight, Lock, MapPin } from "lucide-react";
+import { getAuthUser, type AuthUser } from "@/lib/auth/client";
+import { STATES, formatServiceType, formatVerificationLevel, type StateDefinition, type ServiceDefinition, type VerificationLevel } from "@/lib/config/catalog";
 
 interface MemberDraft {
   fullName: string;
@@ -23,20 +24,13 @@ interface MemberDraft {
   isEarning: boolean;
 }
 
-const SERVICES = [
-  {
-    id: "rj_family_income_certificate",
-    name: "Rajasthan Family Income Certificate",
-    enabled: true,
-  },
-  { id: "rj_caste_certificate", name: "Rajasthan Caste Certificate", enabled: false },
-  { id: "rj_domicile_certificate", name: "Rajasthan Domicile Certificate", enabled: false },
-];
-
 const RELATIONS = ["self", "spouse", "father", "mother", "son", "daughter", "other"];
 
 export default function NewApplicationPage() {
   const router = useRouter();
+  const [auth, setAuth] = useState<AuthUser | null>(null);
+  const [selectedState, setSelectedState] = useState<StateDefinition | null>(null);
+  const [selectedService, setSelectedService] = useState<ServiceDefinition | null>(null);
   const [citizenName, setCitizenName] = useState("");
   const [operatorName, setOperatorName] = useState("");
   const [deadline, setDeadline] = useState("");
@@ -44,6 +38,24 @@ export default function NewApplicationPage() {
     { fullName: "", relation: "self", isEarning: true },
   ]);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const user = getAuthUser();
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    setAuth(user);
+    setOperatorName(user.name);
+    const state = STATES.find((s) => s.id === user.stateId);
+    if (state) {
+      setSelectedState(state);
+      const enabledService = state.services.find((s) => s.enabled);
+      if (enabledService) {
+        setSelectedService(enabledService);
+      }
+    }
+  }, [router]);
 
   const addMember = () => {
     setMembers([...members, { fullName: "", relation: "son", isEarning: false }]);
@@ -70,8 +82,8 @@ export default function NewApplicationPage() {
       toast.error("Citizen name is required");
       return;
     }
-    if (!operatorName.trim()) {
-      toast.error("Operator name is required");
+    if (!selectedState || !selectedService) {
+      toast.error("Select a state and service");
       return;
     }
     const validMembers = members.filter((m) => m.fullName.trim());
@@ -88,6 +100,8 @@ export default function NewApplicationPage() {
         body: JSON.stringify({
           citizenName: citizenName.trim(),
           operatorName: operatorName.trim(),
+          stateId: selectedState.id,
+          serviceId: selectedService.id,
           intendedUseDeadline: deadline || null,
           familyMembers: validMembers.map((m) => ({
             fullName: m.fullName.trim(),
@@ -112,42 +126,100 @@ export default function NewApplicationPage() {
     }
   };
 
+  if (!auth) return null;
+
   return (
     <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <h1 className="text-2xl font-bold mb-1">New Application</h1>
       <p className="text-sm text-muted-foreground mb-6">
-        Step 1: Select service and enter applicant details
+        Step 1: Select state, service, and enter applicant details
       </p>
 
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="text-base">Select Service</CardTitle>
+          <CardTitle className="text-base flex items-center gap-2">
+            <MapPin className="h-4 w-4 text-primary" />
+            Select State
+          </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2">
-          {SERVICES.map((svc) => (
-            <div
-              key={svc.id}
-              className={`flex items-center justify-between p-3 rounded-lg border ${
-                svc.enabled
-                  ? "border-primary bg-primary/5"
-                  : "border-dashed opacity-50"
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                {svc.enabled ? (
-                  <div className="w-3 h-3 rounded-full bg-primary" />
-                ) : (
-                  <Lock className="h-3 w-3 text-muted-foreground" />
-                )}
-                <span className="text-sm font-medium">{svc.name}</span>
-              </div>
-              {!svc.enabled && (
-                <span className="text-xs text-muted-foreground">Coming soon</span>
-              )}
-            </div>
-          ))}
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {STATES.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => {
+                  setSelectedState(s);
+                  setSelectedService(null);
+                }}
+                className={`p-4 rounded-xl border-2 text-left transition-all ${
+                  selectedState?.id === s.id
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/30"
+                }`}
+              >
+                <p className="text-sm font-bold">{s.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  {s.services.filter((sv) => sv.enabled).length} service(s) available
+                </p>
+              </button>
+            ))}
+          </div>
         </CardContent>
       </Card>
+
+      {selectedState && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-base">Select Service — {selectedState.name}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {selectedState.services.map((svc) => (
+              <div
+                key={svc.id}
+                onClick={() => svc.enabled && setSelectedService(svc)}
+                className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all ${
+                  selectedService?.id === svc.id
+                    ? "border-primary bg-primary/5"
+                    : svc.enabled
+                    ? "border-border hover:border-primary/30"
+                    : "border-dashed opacity-50 cursor-not-allowed"
+                }`}
+              >
+                <div>
+                  <div className="flex items-center gap-2">
+                    {svc.enabled ? (
+                      <div className="w-3 h-3 rounded-full bg-primary" />
+                    ) : (
+                      <Lock className="h-3 w-3 text-muted-foreground" />
+                    )}
+                    <span className="text-sm font-medium">{svc.name}</span>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                      svc.serviceType === "welfare_scheme"
+                        ? "bg-blue-500/10 text-blue-600"
+                        : "bg-[#F0F7F3] text-[#4A7A59]"
+                    }`}>
+                      {formatServiceType(svc.serviceType)}
+                    </span>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                      svc.verificationLevel === "verified"
+                        ? "bg-[#4A7A59]/10 text-[#4A7A59]"
+                        : svc.verificationLevel === "simplified"
+                        ? "bg-[#F59E0B]/10 text-[#F59E0B]"
+                        : "bg-muted text-muted-foreground"
+                    }`}>
+                      {formatVerificationLevel(svc.verificationLevel)}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1 ml-5">{svc.description}</p>
+                </div>
+                {!svc.enabled && (
+                  <span className="text-xs text-muted-foreground">Coming soon</span>
+                )}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="mb-6">
         <CardHeader>
@@ -164,7 +236,7 @@ export default function NewApplicationPage() {
             />
           </div>
           <div>
-            <Label htmlFor="operator">Operator Name (eMitra Kiosk)</Label>
+            <Label htmlFor="operator">Operator Name</Label>
             <Input
               id="operator"
               value={operatorName}

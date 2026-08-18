@@ -57,32 +57,23 @@ export default function LandingNavbar() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
-            <Link href="/dashboard">
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-[#EAE5DC] text-[#1C1B1A] hover:bg-[#F5F2EB]"
-              >
-                Dashboard
-              </Button>
-            </Link>
-            <Link href="/applications/new">
+            <Link href="/login">
               <Button
                 size="sm"
                 className="bg-[#C85A40] hover:bg-[#A84C36] text-white"
               >
-                New Application
+                Sign In
               </Button>
             </Link>
           </div>
 
           <div className="md:hidden flex items-center gap-2">
-            <Link href="/applications/new">
+            <Link href="/login">
               <Button
                 size="sm"
                 className="text-xs px-3 bg-[#C85A40] hover:bg-[#A84C36] text-white"
               >
-                New App
+                Sign In
               </Button>
             </Link>
             <button
@@ -157,18 +148,10 @@ export default function LandingNavbar() {
               ))}
             </nav>
 
-            <div className="px-4 py-4 border-t border-[#EAE5DC] space-y-2">
-              <Link href="/dashboard" onClick={() => setOpen(false)}>
-                <Button
-                  variant="outline"
-                  className="w-full border-[#EAE5DC] text-[#1C1B1A]"
-                >
-                  Dashboard
-                </Button>
-              </Link>
-              <Link href="/applications/new" onClick={() => setOpen(false)}>
+            <div className="px-4 py-4 border-t border-[#EAE5DC]">
+              <Link href="/login" onClick={() => setOpen(false)}>
                 <Button className="w-full bg-[#C85A40] hover:bg-[#A84C36] text-white">
-                  New Application
+                  Sign In
                 </Button>
               </Link>
             </div>

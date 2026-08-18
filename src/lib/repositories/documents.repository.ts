@@ -7,7 +7,14 @@ export type DocType =
   | "address_proof"
   | "income_proof_salaried"
   | "income_proof_nonsalaried"
-  | "photo";
+  | "photo"
+  | "community_proof"
+  | "residence_proof"
+  | "death_certificate"
+  | "age_proof"
+  | "bank_account_proof"
+  | "prior_caste_certificate"
+  | "community_reference";
 
 export interface AddDocumentInput {
   applicationId: string;

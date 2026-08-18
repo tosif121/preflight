@@ -1,0 +1,20 @@
+{
+  "id": "up_domicile_certificate",
+  "name": "Uttar Pradesh Domicile Certificate",
+  "version": "1.0",
+  "state": "uttar_pradesh",
+  "prerequisites": [
+    "Applicant must have resided in UP for at least 3 years",
+    "Residence proof required"
+  ],
+  "required_documents": [
+    { "doc_type": "identity_proof", "scope": "per_member", "description": "Aadhaar or equivalent identity proof" },
+    { "doc_type": "address_proof", "scope": "per_application", "description": "Utility bill, rent agreement, or address on Aadhaar" },
+    { "doc_type": "residence_proof", "scope": "per_application", "description": "Proof of 3+ years residence in UP" }
+  ],
+  "cross_checks": [
+    { "id": "name_consistency", "severity": "blocker", "description": "Name must match across identity and residence proof", "check_type": "consistency" },
+    { "id": "address_consistency", "severity": "warning", "description": "Address should be consistent across documents", "check_type": "consistency" },
+    { "id": "document_quality", "severity": "warning", "description": "OCR confidence above 0.75", "check_type": "quality" }
+  ]
+}

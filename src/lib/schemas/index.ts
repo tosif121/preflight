@@ -6,11 +6,16 @@ const docTypeEnum = z.enum([
   "income_proof_salaried",
   "income_proof_nonsalaried",
   "photo",
+  "community_proof",
+  "residence_proof",
+  "death_certificate",
 ]);
 
 export const createApplicationSchema = z.object({
   citizenName: z.string().min(1, "Citizen name is required"),
   operatorName: z.string().min(1, "Operator name is required"),
+  stateId: z.string().min(1, "State is required"),
+  serviceId: z.string().min(1, "Service is required"),
   intendedUseDeadline: z.string().optional().nullable(),
   familyMembers: z
     .array(

@@ -4,7 +4,7 @@ import { applications, type Application, type NewApplication } from "@/lib/db/sc
 
 export interface CreateApplicationInput {
   serviceId?: string;
-  state?: string;
+  stateId?: string;
   operatorName: string;
   citizenName: string;
   intendedUseDeadline?: string | null;
@@ -16,7 +16,7 @@ export const applicationsRepository = {
       .insert(applications)
       .values({
         serviceId: input.serviceId ?? "rj_family_income_certificate",
-        state: input.state ?? "rajasthan",
+        state: input.stateId ?? "rajasthan",
         operatorName: input.operatorName,
         citizenName: input.citizenName,
         intendedUseDeadline: input.intendedUseDeadline ?? null,
@@ -39,6 +39,14 @@ export const applicationsRepository = {
     return db
       .select()
       .from(applications)
+      .orderBy(desc(applications.createdAt));
+  },
+
+  async listByState(stateId: string): Promise<Application[]> {
+    return db
+      .select()
+      .from(applications)
+      .where(eq(applications.state, stateId))
       .orderBy(desc(applications.createdAt));
   },
 

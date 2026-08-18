@@ -4,8 +4,16 @@ import { applicationsRepository } from "@/lib/repositories/applications.reposito
 import { familyMembersRepository } from "@/lib/repositories/family-members.repository";
 import { auditRepository } from "@/lib/repositories/audit.repository";
 
-export async function GET() {
-  const apps = await applicationsRepository.listApplications();
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const stateId = searchParams.get("stateId");
+
+  let apps;
+  if (stateId) {
+    apps = await applicationsRepository.listByState(stateId);
+  } else {
+    apps = await applicationsRepository.listApplications();
+  }
   return Response.json(apps);
 }
 
@@ -20,12 +28,14 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { citizenName, operatorName, intendedUseDeadline, familyMembers } =
+  const { citizenName, operatorName, intendedUseDeadline, familyMembers, stateId, serviceId } =
     parsed.data;
 
   const application = await applicationsRepository.createApplication({
     citizenName,
     operatorName,
+    stateId,
+    serviceId,
     intendedUseDeadline: intendedUseDeadline ?? null,
   });
 
@@ -41,6 +51,8 @@ export async function POST(request: NextRequest) {
   await auditRepository.logEvent(application.id, "application_created", {
     citizenName,
     operatorName,
+    stateId,
+    serviceId,
     memberCount: familyMembers.length,
   });
 

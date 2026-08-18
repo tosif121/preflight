@@ -1,8 +1,9 @@
 "use client";
 
-import { ArrowRight, CheckCircle2, ShieldCheck, FileSearch } from "lucide-react";
+import { ArrowRight, CheckCircle2, ShieldCheck, FileSearch, MapPin } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { STATES } from "@/lib/config/catalog";
 
 const POINTS = [
   "Catch document errors before submission",
@@ -17,7 +18,7 @@ export default function LandingHero() {
         <div className="order-2 lg:order-1">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#EAE5DC] text-[13px] font-medium text-[#C85A40] mb-7 tracking-wide">
             <span className="w-1.5 h-1.5 rounded-full bg-[#C85A40] animate-pulse" />
-            Pre-submission quality checks
+            Pre-submission quality checks — {STATES.length} states
           </div>
 
           <h1
@@ -47,8 +48,8 @@ export default function LandingHero() {
 
           <p className="text-[15px] text-[#7A7771] max-w-[420px] leading-relaxed mb-7">
             Preflight catches completeness and consistency problems in your
-            Family Income Certificate application before it goes to the
-            department. Fix issues now, not after rejection.
+            government service applications before they go to the department.
+            Fix issues now, not after rejection.
           </p>
 
           <div className="flex flex-col gap-2.5 mb-8">
@@ -66,18 +67,18 @@ export default function LandingHero() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-8 sm:max-w-xl">
-            <Link href="/applications/new">
+            <Link href="/login">
               <Button
                 size="lg"
                 className="w-full sm:w-auto bg-[#C85A40] hover:bg-[#A84C36] text-white shadow-[0_4px_16px_rgba(200,90,64,0.35)] hover:shadow-[0_6px_20px_rgba(200,90,64,0.45)] transition-all"
               >
                 <FileSearch className="h-4 w-4 mr-2" />
-                Start New Application
+                Get Started
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </Link>
 
-            <Link href="/dashboard">
+            <Link href="/login">
               <Button
                 variant="outline"
                 size="lg"
@@ -89,20 +90,16 @@ export default function LandingHero() {
             </Link>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4">
-            {["Free to use", "No account needed", "Demo data included"].map(
-              (t) => (
-                <div
-                  key={t}
-                  className="flex items-center gap-2 text-sm font-semibold text-[#1C1B1A]"
-                >
-                  <span className="w-5 h-5 rounded-full bg-[#F0F7F3] flex items-center justify-center shrink-0">
-                    <CheckCircle2 size={12} className="text-[#4A7A59]" />
-                  </span>
-                  {t}
-                </div>
-              )
-            )}
+          <div className="flex flex-wrap items-center gap-3">
+            {STATES.map((s) => (
+              <div
+                key={s.id}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#EAE5DC] text-xs font-medium text-[#7A7771]"
+              >
+                <MapPin size={11} className="text-[#C85A40]" />
+                {s.name}
+              </div>
+            ))}
           </div>
         </div>
 

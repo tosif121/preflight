@@ -13,8 +13,8 @@ import Link from "next/link";
 const STEPS = [
   {
     number: "01",
-    title: "Create Application",
-    desc: "Enter citizen details, add family members, and mark who earns income.",
+    title: "Sign In",
+    desc: "Enter your phone number, verify with OTP, and select your state.",
     icon: Upload,
     color: "#C85A40",
     bg: "#FFF5F0",
@@ -22,8 +22,8 @@ const STEPS = [
   },
   {
     number: "02",
-    title: "Upload Documents",
-    desc: "Attach identity proofs, income proofs, and address proof for each member.",
+    title: "Create Application",
+    desc: "Select a service, enter citizen details, add family members.",
     icon: FileSearch,
     color: "#4A7A59",
     bg: "#F0F7F3",
@@ -31,8 +31,8 @@ const STEPS = [
   },
   {
     number: "03",
-    title: "Run Preflight",
-    desc: "AI checks completeness, name consistency, and document quality.",
+    title: "Upload & Run Checks",
+    desc: "Attach mock documents, run preflight. AI catches errors instantly.",
     icon: CheckCircle2,
     color: "#5B6FA6",
     bg: "#F0F2FA",
@@ -66,14 +66,14 @@ export default function LandingHowItWorks() {
             className="font-bold tracking-tight leading-tight text-[#050505] mb-4"
             style={{ fontSize: "clamp(22px, 4vw, 42px)" }}
           >
-            From Draft to Submission
+            From Login to Submission
             <br />
             <span className="text-[#C85A40]">in Minutes</span>
           </h2>
 
           <p className="text-sm sm:text-base text-[#62605D] max-w-lg mx-auto mb-14 leading-relaxed">
-            No technical skills needed. Upload documents, let the engine check
-            them, fix what it finds, and submit a clean packet.
+            No technical skills needed. Sign in, upload documents, let the engine
+            check them, fix what it finds, and submit a clean packet.
           </p>
         </div>
 
@@ -146,17 +146,17 @@ export default function LandingHowItWorks() {
         </div>
 
         <div className="mt-14">
-          <Link href="/applications/new">
+          <Link href="/login">
             <Button
               size="lg"
               className="bg-[#C85A40] hover:bg-[#A84C36] text-white shadow-[0_14px_28px_rgba(200,90,64,0.28)] hover:shadow-[0_18px_36px_rgba(200,90,64,0.35)] hover:-translate-y-0.5 transition-all"
             >
-              Start Your First Application
+              Get Started
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </Link>
           <p className="text-xs text-[#62605D] mt-3">
-            No sign-up required · Demo data included
+            Demo OTP: 123456 · Demo data included
           </p>
         </div>
       </div>

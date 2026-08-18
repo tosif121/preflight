@@ -10,9 +10,18 @@ import {
   Eye,
   FileText,
   CheckCircle2,
+  MapPin,
 } from "lucide-react";
 
 const FEATURES = [
+  {
+    icon: MapPin,
+    title: "Multi-State Support",
+    description:
+      "Rajasthan, Uttar Pradesh, Karnataka — and more coming. Each state gets its own rule pack and service catalog.",
+    color: "text-[#C85A40]",
+    bg: "bg-[#C85A40]/10",
+  },
   {
     icon: ScanLine,
     title: "AI OCR Extraction",
@@ -73,17 +82,9 @@ const FEATURES = [
     icon: FileText,
     title: "Rule Pack Pattern",
     description:
-      "Rajasthan Family Income Certificate rule pack today. The same engine supports future certificate types.",
+      "State-specific rule packs. One engine, many services. Today Rajasthan Income Certificate — tomorrow any certificate.",
     color: "text-[#A0522D]",
     bg: "bg-[#A0522D]/10",
-  },
-  {
-    icon: CheckCircle2,
-    title: "Plain-Language Fixes",
-    description:
-      "Every failed check comes with a clear, actionable instruction — no jargon, no guesswork.",
-    color: "text-[#4A7A59]",
-    bg: "bg-[#4A7A59]/10",
   },
 ];
 

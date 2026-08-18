@@ -2,26 +2,29 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   PlusCircle,
   FileText,
   CheckCircle2,
   XCircle,
-  AlertTriangle,
   Clock,
   Send,
   ArrowRight,
 } from "lucide-react";
+import { getAuthUser, type AuthUser } from "@/lib/auth/client";
+import { getStateById } from "@/lib/config/catalog";
 
 interface Application {
   id: string;
   citizenName: string;
   operatorName: string;
   status: string;
+  state: string;
+  serviceId: string;
   createdAt: string;
   intendedUseDeadline: string | null;
 }
@@ -37,19 +40,40 @@ const STATUS_CONFIG: Record<
   submitted: { label: "Submitted", variant: "default", icon: Send },
 };
 
+function formatServiceName(serviceId: string): string {
+  return serviceId
+    .replace(/^rj_|^up_|^ka_/, "")
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+    .replace(/Certificate$/, "Certificate");
+}
+
 export default function DashboardPage() {
+  const router = useRouter();
+  const [auth, setAuth] = useState<AuthUser | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/applications")
+    const user = getAuthUser();
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    setAuth(user);
+
+    fetch(`/api/applications?stateId=${user.stateId}`)
       .then((r) => r.json())
       .then((data) => {
         setApplications(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, []);
+  }, [router]);
+
+  if (!auth) return null;
+
+  const stateName = getStateById(auth.stateId)?.name ?? auth.stateId;
 
   return (
     <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -57,7 +81,7 @@ export default function DashboardPage() {
         <div>
           <h1 className="text-2xl font-bold">Applications</h1>
           <p className="text-sm text-muted-foreground">
-            Manage Family Income Certificate applications
+            {stateName} — {auth.role === "operator" ? "Service Operator" : "Citizen"} dashboard
           </p>
         </div>
         <Link href="/applications/new">
@@ -80,8 +104,7 @@ export default function DashboardPage() {
             <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
             <p className="text-lg font-medium">No applications yet</p>
             <p className="text-sm text-muted-foreground mb-4">
-              Create your first Family Income Certificate application to get
-              started.
+              Create your first application in {stateName} to get started.
             </p>
             <Link href="/applications/new">
               <Button>
@@ -104,7 +127,7 @@ export default function DashboardPage() {
                     <div className="flex-1 min-w-0">
                       <p className="font-medium truncate">{app.citizenName}</p>
                       <p className="text-sm text-muted-foreground">
-                        Operator: {app.operatorName}
+                        {formatServiceName(app.serviceId)}
                       </p>
                     </div>
                     <Badge variant={cfg.variant}>{cfg.label}</Badge>

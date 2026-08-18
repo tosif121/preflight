@@ -23,6 +23,8 @@ export async function POST(
   await checksRepository.clearChecks(id);
 
   const ruleResults = evaluateRules(
+    application.state,
+    application.serviceId,
     members,
     docs.map((d) => ({
       id: d.id,
@@ -56,6 +58,8 @@ export async function POST(
       (r) => r.severity === "warning" && r.status !== "pass"
     ).length,
     readiness: newStatus,
+    state: application.state,
+    serviceId: application.serviceId,
   });
 
   const passed = ruleResults.filter((r) => r.status === "pass").length;

@@ -1,0 +1,20 @@
+{
+  "id": "ka_caste_certificate",
+  "name": "Karnataka Caste Certificate",
+  "version": "1.0",
+  "state": "karnataka",
+  "prerequisites": [
+    "Applicant must belong to SC/ST/OBC category",
+    "Community proof document required"
+  ],
+  "required_documents": [
+    { "doc_type": "identity_proof", "scope": "per_member", "description": "Aadhaar or equivalent identity proof" },
+    { "doc_type": "address_proof", "scope": "per_application", "description": "Address proof for Karnataka residence" },
+    { "doc_type": "community_proof", "scope": "per_application", "description": "Community certificate or parent's caste certificate" }
+  ],
+  "cross_checks": [
+    { "id": "name_consistency", "severity": "blocker", "description": "Name must match across identity and community proof", "check_type": "consistency" },
+    { "id": "address_consistency", "severity": "warning", "description": "Address should match on identity and address proof", "check_type": "consistency" },
+    { "id": "document_quality", "severity": "warning", "description": "OCR confidence above 0.75", "check_type": "quality" }
+  ]
+}

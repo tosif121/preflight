@@ -40,11 +40,29 @@ interface DocRecord {
   extractedData: Record<string, unknown> | null;
 }
 
-function loadRulePack(): RulePack {
-  const raw = readFileSync(
-    join(process.cwd(), "src/lib/rules/rajasthan/family-income.json"),
-    "utf-8"
-  );
+function loadRulePack(stateId: string, serviceId: string): RulePack {
+  const stateDir = stateId.replace(/_/g, "-");
+  const serviceFile = serviceId
+    .replace(/^rj_/, "")
+    .replace(/^up_/, "")
+    .replace(/^ka_/, "")
+    .replace(/_certificate$/, "")
+    .replace(/_pension$/, "")
+    .replace(/-certificate$/, "")
+    .replace(/-pension$/, "");
+
+  let raw: string;
+  try {
+    raw = readFileSync(
+      join(process.cwd(), `src/lib/rules/${stateDir}/${serviceFile}.json`),
+      "utf-8"
+    );
+  } catch {
+    raw = readFileSync(
+      join(process.cwd(), "src/lib/rules/rajasthan/family-income.json"),
+      "utf-8"
+    );
+  }
   return JSON.parse(raw);
 }
 
@@ -270,6 +288,8 @@ function checkDocumentQuality(docs: DocRecord[]): CheckResult {
 }
 
 export function evaluateRules(
+  stateId: string,
+  serviceId: string,
   members: FamilyMember[],
   rawDocs: Array<{
     id: string;
@@ -289,7 +309,7 @@ export function evaluateRules(
         : null,
   }));
 
-  const pack = loadRulePack();
+  const pack = loadRulePack(stateId, serviceId);
   const results: CheckResult[] = [];
 
   for (const rule of pack.cross_checks) {

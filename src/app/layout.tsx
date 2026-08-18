@@ -16,9 +16,9 @@ const playfairSC = Playfair_Display_SC({
 });
 
 export const metadata: Metadata = {
-  title: "Preflight — Application Quality Check",
+  title: "Preflight — Pre-submission Quality Checks",
   description:
-    "Pre-submission quality checks for Rajasthan eMitra service applications",
+    "Catch document errors and consistency issues in government service applications before submission. Supports Rajasthan, Uttar Pradesh, and Karnataka.",
 };
 
 export default function RootLayout({
