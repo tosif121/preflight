@@ -3,13 +3,14 @@
 import { ArrowRight, CheckCircle2, ShieldCheck, FileSearch, MapPin } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { STATES } from "@/lib/config/catalog";
 
 const POINTS = [
   "Catch document errors before submission",
   "AI-powered OCR with plain-language fixes",
   "Zero blockers = ready to submit",
 ];
+
+const STATE_NAMES = ["Rajasthan", "Uttar Pradesh", "Karnataka"];
 
 export default function LandingHero() {
   return (
@@ -18,7 +19,7 @@ export default function LandingHero() {
         <div className="order-2 lg:order-1">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#EAE5DC] text-[13px] font-medium text-[#C85A40] mb-7 tracking-wide">
             <span className="w-1.5 h-1.5 rounded-full bg-[#C85A40] animate-pulse" />
-            Pre-submission quality checks — {STATES.length} states
+            Pre-submission quality checks — {STATE_NAMES.length} states
           </div>
 
           <h1
@@ -91,13 +92,13 @@ export default function LandingHero() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            {STATES.map((s) => (
+            {STATE_NAMES.map((name) => (
               <div
-                key={s.id}
+                key={name}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#EAE5DC] text-xs font-medium text-[#7A7771]"
               >
                 <MapPin size={11} className="text-[#C85A40]" />
-                {s.name}
+                {name}
               </div>
             ))}
           </div>

@@ -1,23 +1,25 @@
 import { eq, desc } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { applications, type Application, type NewApplication } from "@/lib/db/schema";
+import { applications, type Application } from "@/lib/db/schema";
 
 export interface CreateApplicationInput {
-  serviceId?: string;
-  stateId?: string;
-  operatorName: string;
+  operatorId: string;
+  stateId: string;
+  serviceId: string;
+  rulePackId?: string | null;
   citizenName: string;
   intendedUseDeadline?: string | null;
 }
 
 export const applicationsRepository = {
-  async createApplication(input: CreateApplicationInput): Promise<Application> {
+  async create(input: CreateApplicationInput): Promise<Application> {
     const rows = await db
       .insert(applications)
       .values({
-        serviceId: input.serviceId ?? "rj_family_income_certificate",
-        state: input.stateId ?? "rajasthan",
-        operatorName: input.operatorName,
+        operatorId: input.operatorId,
+        stateId: input.stateId,
+        serviceId: input.serviceId,
+        rulePackId: input.rulePackId ?? null,
         citizenName: input.citizenName,
         intendedUseDeadline: input.intendedUseDeadline ?? null,
         status: "draft",
@@ -26,7 +28,7 @@ export const applicationsRepository = {
     return rows[0];
   },
 
-  async getApplicationById(id: string): Promise<Application | undefined> {
+  async findById(id: string): Promise<Application | undefined> {
     const rows = await db
       .select()
       .from(applications)
@@ -35,10 +37,11 @@ export const applicationsRepository = {
     return rows[0];
   },
 
-  async listApplications(): Promise<Application[]> {
+  async listByOperator(operatorId: string): Promise<Application[]> {
     return db
       .select()
       .from(applications)
+      .where(eq(applications.operatorId, operatorId))
       .orderBy(desc(applications.createdAt));
   },
 
@@ -46,11 +49,15 @@ export const applicationsRepository = {
     return db
       .select()
       .from(applications)
-      .where(eq(applications.state, stateId))
+      .where(eq(applications.stateId, stateId))
       .orderBy(desc(applications.createdAt));
   },
 
-  async updateApplicationStatus(
+  async listAll(): Promise<Application[]> {
+    return db.select().from(applications).orderBy(desc(applications.createdAt));
+  },
+
+  async updateStatus(
     id: string,
     status: Application["status"]
   ): Promise<Application | undefined> {

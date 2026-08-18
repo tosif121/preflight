@@ -24,15 +24,8 @@ export interface AddDocumentInput {
   mockImageUrl: string;
 }
 
-export interface UpdateOcrResultInput {
-  id: string;
-  ocrStatus: "pending" | "complete" | "failed";
-  ocrConfidence?: number | null;
-  extractedData?: Record<string, unknown> | null;
-}
-
 export const documentsRepository = {
-  async addDocument(input: AddDocumentInput): Promise<Document> {
+  async add(input: AddDocumentInput): Promise<Document> {
     const rows = await db
       .insert(documents)
       .values({
@@ -41,14 +34,34 @@ export const documentsRepository = {
         docType: input.docType,
         mockFileName: input.mockFileName,
         mockImageUrl: input.mockImageUrl,
-        ocrStatus: "pending",
       })
       .returning();
-    return rows[0] as Document;
+    return rows[0];
+  },
+
+  async findById(id: string): Promise<Document | undefined> {
+    const rows = await db
+      .select()
+      .from(documents)
+      .where(eq(documents.id, id))
+      .limit(1);
+    return rows[0];
+  },
+
+  async listByApplication(applicationId: string): Promise<Document[]> {
+    return db
+      .select()
+      .from(documents)
+      .where(eq(documents.applicationId, applicationId));
   },
 
   async updateOcrResult(
-    input: UpdateOcrResultInput
+    id: string,
+    input: {
+      ocrStatus: "pending" | "complete" | "failed";
+      ocrConfidence?: number | null;
+      extractedData?: Record<string, unknown> | null;
+    }
   ): Promise<Document | undefined> {
     const rows = await db
       .update(documents)
@@ -57,16 +70,8 @@ export const documentsRepository = {
         ocrConfidence: input.ocrConfidence ?? null,
         extractedData: (input.extractedData as Record<string, unknown>) ?? null,
       })
-      .where(eq(documents.id, input.id))
+      .where(eq(documents.id, id))
       .returning();
-    return rows[0] as Document | undefined;
-  },
-
-  async listByApplication(applicationId: string): Promise<Document[]> {
-    const rows = await db
-      .select()
-      .from(documents)
-      .where(eq(documents.applicationId, applicationId));
-    return rows as Document[];
+    return rows[0];
   },
 };

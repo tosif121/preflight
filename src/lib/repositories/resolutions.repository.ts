@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { resolutions, type Resolution } from "@/lib/db/schema";
+import { resolutions, preflightChecks, type Resolution } from "@/lib/db/schema";
 
 export interface CreateResolutionInput {
   checkId: string;
@@ -8,7 +8,7 @@ export interface CreateResolutionInput {
 }
 
 export const resolutionsRepository = {
-  async createResolution(input: CreateResolutionInput): Promise<Resolution> {
+  async create(input: CreateResolutionInput): Promise<Resolution> {
     const rows = await db
       .insert(resolutions)
       .values({
@@ -19,23 +19,19 @@ export const resolutionsRepository = {
     return rows[0];
   },
 
-  async markResolved(id: string): Promise<Resolution | undefined> {
-    const rows = await db
-      .update(resolutions)
-      .set({ resolved: true, resolvedAt: new Date() })
-      .where(eq(resolutions.id, id))
-      .returning();
-    return rows[0];
-  },
-
   async listByApplication(applicationId: string): Promise<Resolution[]> {
-    const { checks } = await import("@/lib/db/schema");
-    return db
-      .select()
+    const rows = await db
+      .select({
+        id: resolutions.id,
+        checkId: resolutions.checkId,
+        plainLanguageFix: resolutions.plainLanguageFix,
+        resolved: resolutions.resolved,
+        resolvedAt: resolutions.resolvedAt,
+      })
       .from(resolutions)
-      .innerJoin(checks, eq(resolutions.checkId, checks.id))
-      .where(eq(checks.applicationId, applicationId))
-      .then((rows) => rows.map((r) => r.resolutions));
+      .innerJoin(preflightChecks, eq(resolutions.checkId, preflightChecks.id))
+      .where(eq(preflightChecks.applicationId, applicationId));
+    return rows;
   },
 
   async findByCheckId(checkId: string): Promise<Resolution | undefined> {
@@ -44,6 +40,15 @@ export const resolutionsRepository = {
       .from(resolutions)
       .where(eq(resolutions.checkId, checkId))
       .limit(1);
+    return rows[0];
+  },
+
+  async markResolved(id: string): Promise<Resolution | undefined> {
+    const rows = await db
+      .update(resolutions)
+      .set({ resolved: true, resolvedAt: new Date() })
+      .where(eq(resolutions.id, id))
+      .returning();
     return rows[0];
   },
 };

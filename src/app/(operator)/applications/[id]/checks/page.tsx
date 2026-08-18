@@ -48,6 +48,8 @@ interface Application {
   id: string;
   citizenName: string;
   status: string;
+  stateName: string;
+  serviceName: string;
 }
 
 const RULE_LABELS: Record<string, string> = {
@@ -56,6 +58,10 @@ const RULE_LABELS: Record<string, string> = {
   income_coverage: "Income Coverage",
   certificate_use_by_date: "Certificate Validity Period",
   document_quality: "Document Quality",
+  lineage_reference_present: "Lineage Reference",
+  age_eligibility: "Age Eligibility",
+  income_ceiling: "Income Ceiling",
+  bank_account_proof_present: "Bank Account Proof",
 };
 
 export default function ChecksPage() {
@@ -89,7 +95,7 @@ export default function ChecksPage() {
   const runChecks = async () => {
     setRunning(true);
     try {
-      const res = await fetch(`/api/applications/${appId}/run-checks`, {
+      const res = await fetch(`/api/applications/${appId}/evaluate`, {
         method: "POST",
       });
       if (!res.ok) throw new Error("Failed to run checks");
@@ -108,8 +114,8 @@ export default function ChecksPage() {
   const resolveCheck = async (checkId: string) => {
     try {
       const res = await fetch(
-        `/api/applications/${appId}/checks/${checkId}/resolve`,
-        { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) }
+        `/api/applications/${appId}/resolve`,
+        { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ checkId }) }
       );
       if (!res.ok) throw new Error("Failed to resolve");
       toast.success("Issue marked resolved");
@@ -161,7 +167,7 @@ export default function ChecksPage() {
             <p className="text-lg font-medium mb-2">No checks run yet</p>
             <p className="text-sm text-muted-foreground mb-4">
               Run preflight checks to evaluate your documents against the rule
-              pack for Rajasthan Family Income Certificate.
+              pack for this service.
             </p>
             <Button onClick={runChecks} disabled={running}>
               <Play className="h-4 w-4 mr-2" />

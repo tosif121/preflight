@@ -1,27 +1,9 @@
-import { readFileSync } from "fs";
-import { join } from "path";
-
-interface RulePack {
-  id: string;
-  name: string;
-  cross_checks: Array<{
-    id: string;
-    severity: "blocker" | "warning";
-    description: string;
-    check_type: string;
-  }>;
-  required_documents: Array<{
-    doc_type: string;
-    scope: string;
-    description: string;
-  }>;
-}
-
 export interface CheckResult {
   ruleId: string;
   severity: "blocker" | "warning";
   status: "pass" | "fail" | "manual_review";
   message: string;
+  evidence?: Record<string, unknown>;
 }
 
 interface FamilyMember {
@@ -40,30 +22,14 @@ interface DocRecord {
   extractedData: Record<string, unknown> | null;
 }
 
-function loadRulePack(stateId: string, serviceId: string): RulePack {
-  const stateDir = stateId.replace(/_/g, "-");
-  const serviceFile = serviceId
-    .replace(/^rj_/, "")
-    .replace(/^up_/, "")
-    .replace(/^ka_/, "")
-    .replace(/_certificate$/, "")
-    .replace(/_pension$/, "")
-    .replace(/-certificate$/, "")
-    .replace(/-pension$/, "");
-
-  let raw: string;
-  try {
-    raw = readFileSync(
-      join(process.cwd(), `src/lib/rules/${stateDir}/${serviceFile}.json`),
-      "utf-8"
-    );
-  } catch {
-    raw = readFileSync(
-      join(process.cwd(), "src/lib/rules/rajasthan/family-income.json"),
-      "utf-8"
-    );
-  }
-  return JSON.parse(raw);
+interface RulePackRules {
+  cross_checks?: Array<{
+    id: string;
+    severity: "blocker" | "warning";
+    description: string;
+    check_type: string;
+  }>;
+  [key: string]: unknown;
 }
 
 function checkNameConsistency(
@@ -97,7 +63,8 @@ function checkNameConsistency(
             ruleId: "name_consistency",
             severity: "blocker",
             status: "fail",
-            message: `Name mismatch for "${member.fullName}": identity proof shows "${idName}" but income proof shows "${incName}". Upload a corrected document.`,
+            message: `Name mismatch for "${member.fullName}": identity proof shows "${idName}" but income proof shows "${incName}".`,
+            evidence: { memberId: member.id, idName, incName },
           };
         }
       }
@@ -114,7 +81,8 @@ function checkNameConsistency(
           ruleId: "name_consistency",
           severity: "blocker",
           status: "fail",
-          message: `Name on identity proof ("${idName}") doesn't match the registered name ("${member.fullName}"). Please re-upload the correct identity proof.`,
+          message: `Name on identity proof ("${idName}") doesn't match the registered name ("${member.fullName}").`,
+          evidence: { memberId: member.id, idName, registeredName: member.fullName },
         };
       }
     }
@@ -137,20 +105,14 @@ function checkAddressConsistency(docs: DocRecord[]): CheckResult {
       ruleId: "address_consistency",
       severity: "warning",
       status: "manual_review",
-      message:
-        "Cannot verify address consistency — missing identity or address proof.",
+      message: "Cannot verify address consistency — missing identity or address proof.",
     };
   }
 
   const idData = identityDocs[0]?.extractedData;
   const addrData = addressDocs[0]?.extractedData;
 
-  if (
-    !idData ||
-    !idData.address ||
-    !addrData ||
-    !addrData.address
-  ) {
+  if (!idData?.address || !addrData?.address) {
     return {
       ruleId: "address_consistency",
       severity: "warning",
@@ -170,7 +132,8 @@ function checkAddressConsistency(docs: DocRecord[]): CheckResult {
       ruleId: "address_consistency",
       severity: "warning",
       status: "fail",
-      message: `Address mismatch: identity proof lists city as "${idAddr.city}" but address proof lists "${addrAddr.city}". Please verify and re-upload if needed.`,
+      message: `Address mismatch: identity proof lists city "${idAddr.city}" but address proof lists "${addrAddr.city}".`,
+      evidence: { idCity: idAddr.city, addrCity: addrAddr.city },
     };
   }
 
@@ -208,7 +171,8 @@ function checkIncomeCoverage(
       ruleId: "income_coverage",
       severity: "blocker",
       status: "fail",
-      message: `Missing income proof for earning member(s): ${missingMembers.join(", ")}. Upload a salary slip, Form 16, ITR, or bank statement for each.`,
+      message: `Missing income proof for earning member(s): ${missingMembers.join(", ")}.`,
+      evidence: { missingMembers },
     };
   }
 
@@ -242,7 +206,8 @@ function checkCertificateUseByDate(
       ruleId: "certificate_use_by_date",
       severity: "blocker",
       status: "fail",
-      message: `Intended use deadline (${intendedUseDeadline}) is beyond the 12-month certificate validity. Certificates must be used within 12 months of issuance. Please adjust the deadline.`,
+      message: `Intended use deadline (${intendedUseDeadline}) is beyond the 12-month validity.`,
+      evidence: { deadline: intendedUseDeadline },
     };
   }
 
@@ -251,7 +216,8 @@ function checkCertificateUseByDate(
       ruleId: "certificate_use_by_date",
       severity: "blocker",
       status: "fail",
-      message: `Intended use deadline (${intendedUseDeadline}) has already passed. Please update to a future date.`,
+      message: `Intended use deadline (${intendedUseDeadline}) has already passed.`,
+      evidence: { deadline: intendedUseDeadline },
     };
   }
 
@@ -275,7 +241,8 @@ function checkDocumentQuality(docs: DocRecord[]): CheckResult {
       ruleId: "document_quality",
       severity: "warning",
       status: "fail",
-      message: `Low OCR confidence detected for: ${names}. Re-upload a clearer scan for more reliable extraction.`,
+      message: `Low OCR confidence detected for: ${names}. Re-upload a clearer scan.`,
+      evidence: { lowQualityDocs: lowQuality.map((d) => d.mockFileName) },
     };
   }
 
@@ -287,9 +254,121 @@ function checkDocumentQuality(docs: DocRecord[]): CheckResult {
   };
 }
 
+function checkLineageReference(docs: DocRecord[]): CheckResult {
+  const hasPrior = docs.some(
+    (d) =>
+      d.docType === "prior_caste_certificate" ||
+      d.docType === "community_reference"
+  );
+
+  if (!hasPrior) {
+    return {
+      ruleId: "lineage_reference_present",
+      severity: "blocker",
+      status: "fail",
+      message: "No prior caste certificate or community reference found. This is a common rejection reason.",
+    };
+  }
+
+  return {
+    ruleId: "lineage_reference_present",
+    severity: "blocker",
+    status: "pass",
+    message: "Caste lineage reference document present.",
+  };
+}
+
+function checkAgeEligibility(docs: DocRecord[]): CheckResult {
+  const ageDoc = docs.find((d) => d.docType === "age_proof");
+  if (!ageDoc?.extractedData?.dateOfBirth) {
+    return {
+      ruleId: "age_eligibility",
+      severity: "blocker",
+      status: "manual_review",
+      message: "Age proof not uploaded or date of birth not extracted. Manual review required.",
+    };
+  }
+
+  const dob = new Date(ageDoc.extractedData.dateOfBirth as string);
+  const age = Math.floor(
+    (Date.now() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000)
+  );
+
+  if (age < 18 || age > 59) {
+    return {
+      ruleId: "age_eligibility",
+      severity: "blocker",
+      status: "fail",
+      message: `Applicant age (${age}) falls outside the 18-59 eligibility band (placeholder — verify real threshold).`,
+      evidence: { age, dob: ageDoc.extractedData.dateOfBirth },
+    };
+  }
+
+  return {
+    ruleId: "age_eligibility",
+    severity: "blocker",
+    status: "pass",
+    message: `Applicant age (${age}) is within eligibility band.`,
+  };
+}
+
+function checkIncomeCeiling(docs: DocRecord[]): CheckResult {
+  const incomeDoc = docs.find(
+    (d) =>
+      d.docType === "income_proof_salaried" ||
+      d.docType === "income_proof_nonsalaried"
+  );
+
+  if (!incomeDoc?.extractedData?.annualIncome) {
+    return {
+      ruleId: "income_ceiling",
+      severity: "warning",
+      status: "manual_review",
+      message: "Income amount not extracted. Manual review recommended.",
+    };
+  }
+
+  const income = Number(incomeDoc.extractedData.annualIncome);
+  if (income > 200000) {
+    return {
+      ruleId: "income_ceiling",
+      severity: "warning",
+      status: "fail",
+      message: `Annual income (₹${income.toLocaleString("en-IN")}) may exceed the pension threshold (placeholder — verify real limit).`,
+      evidence: { annualIncome: income },
+    };
+  }
+
+  return {
+    ruleId: "income_ceiling",
+    severity: "warning",
+    status: "pass",
+    message: "Income appears within eligible range.",
+  };
+}
+
+function checkBankAccountPresent(docs: DocRecord[]): CheckResult {
+  const hasBank = docs.some((d) => d.docType === "bank_account_proof");
+
+  if (!hasBank) {
+    return {
+      ruleId: "bank_account_proof_present",
+      severity: "blocker",
+      status: "fail",
+      message: "Bank account proof is required for pension disbursement.",
+    };
+  }
+
+  return {
+    ruleId: "bank_account_proof_present",
+    severity: "blocker",
+    status: "pass",
+    message: "Bank account proof present.",
+  };
+}
+
 export function evaluateRules(
-  stateId: string,
-  serviceId: string,
+  rulePackRules: Record<string, unknown>,
   members: FamilyMember[],
   rawDocs: Array<{
     id: string;
@@ -309,10 +388,11 @@ export function evaluateRules(
         : null,
   }));
 
-  const pack = loadRulePack(stateId, serviceId);
+  const pack = rulePackRules as RulePackRules;
+  const crossChecks = pack.cross_checks ?? [];
   const results: CheckResult[] = [];
 
-  for (const rule of pack.cross_checks) {
+  for (const rule of crossChecks) {
     let result: CheckResult;
     switch (rule.id) {
       case "name_consistency":
@@ -329,6 +409,18 @@ export function evaluateRules(
         break;
       case "document_quality":
         result = checkDocumentQuality(docs);
+        break;
+      case "lineage_reference_present":
+        result = checkLineageReference(docs);
+        break;
+      case "age_eligibility":
+        result = checkAgeEligibility(docs);
+        break;
+      case "income_ceiling":
+        result = checkIncomeCeiling(docs);
+        break;
+      case "bank_account_proof_present":
+        result = checkBankAccountPresent(docs);
         break;
       default:
         result = {

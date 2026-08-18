@@ -43,11 +43,13 @@ export default function ReviewerGatewayPage() {
 
   const EVENT_LABELS: Record<string, string> = {
     application_created: "Application Created",
-    documents_uploaded: "Documents Uploaded",
+    family_member_added: "Family Member Added",
+    document_uploaded: "Document Uploaded",
     checks_run: "Preflight Checks Run",
+    checks_rerun: "Checks Re-run",
+    check_resolved: "Check Resolved",
     issue_resolved: "Issue Resolved",
-    packet_ready: "Packet Ready",
-    submitted_mock: "Submitted (Mock)",
+    application_submitted: "Application Submitted",
   };
 
   if (loading) {

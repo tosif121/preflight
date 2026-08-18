@@ -15,8 +15,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Trash2, PlusCircle, ArrowRight, Lock, MapPin } from "lucide-react";
-import { getAuthUser, type AuthUser } from "@/lib/auth/client";
-import { STATES, formatServiceType, formatVerificationLevel, type StateDefinition, type ServiceDefinition, type VerificationLevel } from "@/lib/config/catalog";
+
+interface StateItem {
+  id: string;
+  name: string;
+  code: string;
+  portalName: string;
+  status: string;
+}
+
+interface ServiceItem {
+  id: string;
+  stateId: string;
+  name: string;
+  category: string;
+  description: string;
+  status: string;
+}
 
 interface MemberDraft {
   fullName: string;
@@ -26,13 +41,19 @@ interface MemberDraft {
 
 const RELATIONS = ["self", "spouse", "father", "mother", "son", "daughter", "other"];
 
+const STATUS_BADGE: Record<string, { label: string; color: string }> = {
+  live: { label: "Live", color: "bg-[#4A7A59]/10 text-[#4A7A59]" },
+  beta: { label: "Beta", color: "bg-[#F59E0B]/10 text-[#F59E0B]" },
+  coming_soon: { label: "Coming Soon", color: "bg-muted text-muted-foreground" },
+};
+
 export default function NewApplicationPage() {
   const router = useRouter();
-  const [auth, setAuth] = useState<AuthUser | null>(null);
-  const [selectedState, setSelectedState] = useState<StateDefinition | null>(null);
-  const [selectedService, setSelectedService] = useState<ServiceDefinition | null>(null);
+  const [states, setStates] = useState<StateItem[]>([]);
+  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [selectedState, setSelectedState] = useState<string>("");
+  const [selectedService, setSelectedService] = useState<string>("");
   const [citizenName, setCitizenName] = useState("");
-  const [operatorName, setOperatorName] = useState("");
   const [deadline, setDeadline] = useState("");
   const [members, setMembers] = useState<MemberDraft[]>([
     { fullName: "", relation: "self", isEarning: true },
@@ -40,22 +61,19 @@ export default function NewApplicationPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    const user = getAuthUser();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    setAuth(user);
-    setOperatorName(user.name);
-    const state = STATES.find((s) => s.id === user.stateId);
-    if (state) {
-      setSelectedState(state);
-      const enabledService = state.services.find((s) => s.enabled);
-      if (enabledService) {
-        setSelectedService(enabledService);
-      }
-    }
-  }, [router]);
+    fetch("/api/states")
+      .then((r) => r.json())
+      .then((data) => setStates(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!selectedState) { setServices([]); return; }
+    fetch(`/api/states/${selectedState}/services`)
+      .then((r) => r.json())
+      .then((data) => setServices(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, [selectedState]);
 
   const addMember = () => {
     setMembers([...members, { fullName: "", relation: "son", isEarning: false }]);
@@ -67,30 +85,18 @@ export default function NewApplicationPage() {
     }
   };
 
-  const updateMember = (
-    index: number,
-    field: keyof MemberDraft,
-    value: string | boolean | null
-  ) => {
+  const updateMember = (index: number, field: keyof MemberDraft, value: string | boolean) => {
     const updated = [...members];
     updated[index] = { ...updated[index], [field]: value };
     setMembers(updated);
   };
 
   const handleSubmit = async () => {
-    if (!citizenName.trim()) {
-      toast.error("Citizen name is required");
-      return;
-    }
-    if (!selectedState || !selectedService) {
-      toast.error("Select a state and service");
-      return;
-    }
+    if (!citizenName.trim()) { toast.error("Citizen name is required"); return; }
+    if (!selectedState) { toast.error("Select a state"); return; }
+    if (!selectedService) { toast.error("Select a service"); return; }
     const validMembers = members.filter((m) => m.fullName.trim());
-    if (validMembers.length === 0) {
-      toast.error("At least one family member is required");
-      return;
-    }
+    if (validMembers.length === 0) { toast.error("At least one family member is required"); return; }
 
     setSubmitting(true);
     try {
@@ -98,10 +104,9 @@ export default function NewApplicationPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          stateId: selectedState,
+          serviceId: selectedService,
           citizenName: citizenName.trim(),
-          operatorName: operatorName.trim(),
-          stateId: selectedState.id,
-          serviceId: selectedService.id,
           intendedUseDeadline: deadline || null,
           familyMembers: validMembers.map((m) => ({
             fullName: m.fullName.trim(),
@@ -126,8 +131,6 @@ export default function NewApplicationPage() {
     }
   };
 
-  if (!auth) return null;
-
   return (
     <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <h1 className="text-2xl font-bold mb-1">New Application</h1>
@@ -144,23 +147,18 @@ export default function NewApplicationPage() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {STATES.map((s) => (
+            {states.map((s) => (
               <button
                 key={s.id}
-                onClick={() => {
-                  setSelectedState(s);
-                  setSelectedService(null);
-                }}
+                onClick={() => { setSelectedState(s.id); setSelectedService(""); }}
                 className={`p-4 rounded-xl border-2 text-left transition-all ${
-                  selectedState?.id === s.id
+                  selectedState === s.id
                     ? "border-primary bg-primary/5"
                     : "border-border hover:border-primary/30"
                 }`}
               >
                 <p className="text-sm font-bold">{s.name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {s.services.filter((sv) => sv.enabled).length} service(s) available
-                </p>
+                <p className="text-xs text-muted-foreground">{s.portalName}</p>
               </button>
             ))}
           </div>
@@ -170,53 +168,41 @@ export default function NewApplicationPage() {
       {selectedState && (
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="text-base">Select Service — {selectedState.name}</CardTitle>
+            <CardTitle className="text-base">Select Service</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {selectedState.services.map((svc) => (
-              <div
-                key={svc.id}
-                onClick={() => svc.enabled && setSelectedService(svc)}
-                className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all ${
-                  selectedService?.id === svc.id
-                    ? "border-primary bg-primary/5"
-                    : svc.enabled
-                    ? "border-border hover:border-primary/30"
-                    : "border-dashed opacity-50 cursor-not-allowed"
-                }`}
-              >
-                <div>
-                  <div className="flex items-center gap-2">
-                    {svc.enabled ? (
-                      <div className="w-3 h-3 rounded-full bg-primary" />
-                    ) : (
-                      <Lock className="h-3 w-3 text-muted-foreground" />
-                    )}
-                    <span className="text-sm font-medium">{svc.name}</span>
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
-                      svc.serviceType === "welfare_scheme"
-                        ? "bg-blue-500/10 text-blue-600"
-                        : "bg-[#F0F7F3] text-[#4A7A59]"
-                    }`}>
-                      {formatServiceType(svc.serviceType)}
-                    </span>
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
-                      svc.verificationLevel === "verified"
-                        ? "bg-[#4A7A59]/10 text-[#4A7A59]"
-                        : svc.verificationLevel === "simplified"
-                        ? "bg-[#F59E0B]/10 text-[#F59E0B]"
-                        : "bg-muted text-muted-foreground"
-                    }`}>
-                      {formatVerificationLevel(svc.verificationLevel)}
-                    </span>
+            {services.map((svc) => {
+              const badge = STATUS_BADGE[svc.status] ?? STATUS_BADGE.coming_soon;
+              const enabled = svc.status !== "coming_soon";
+              return (
+                <div
+                  key={svc.id}
+                  onClick={() => enabled && setSelectedService(svc.id)}
+                  className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all ${
+                    selectedService === svc.id
+                      ? "border-primary bg-primary/5"
+                      : enabled
+                      ? "border-border hover:border-primary/30"
+                      : "border-dashed opacity-50 cursor-not-allowed"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center gap-2">
+                      {enabled ? (
+                        <div className="w-3 h-3 rounded-full bg-primary" />
+                      ) : (
+                        <Lock className="h-3 w-3 text-muted-foreground" />
+                      )}
+                      <span className="text-sm font-medium">{svc.name}</span>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${badge.color}`}>
+                        {badge.label}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1 ml-5">{svc.description}</p>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1 ml-5">{svc.description}</p>
                 </div>
-                {!svc.enabled && (
-                  <span className="text-xs text-muted-foreground">Coming soon</span>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </CardContent>
         </Card>
       )}
@@ -236,15 +222,6 @@ export default function NewApplicationPage() {
             />
           </div>
           <div>
-            <Label htmlFor="operator">Operator Name</Label>
-            <Input
-              id="operator"
-              value={operatorName}
-              onChange={(e) => setOperatorName(e.target.value)}
-              placeholder="e.g. Amit Verma"
-            />
-          </div>
-          <div>
             <Label htmlFor="deadline">Intended Use Deadline (optional)</Label>
             <Input
               id="deadline"
@@ -252,9 +229,6 @@ export default function NewApplicationPage() {
               value={deadline}
               onChange={(e) => setDeadline(e.target.value)}
             />
-            <p className="text-xs text-muted-foreground mt-1">
-              Certificate must be used within 12 months of issuance
-            </p>
           </div>
         </CardContent>
       </Card>
@@ -273,11 +247,7 @@ export default function NewApplicationPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Member {i + 1}</span>
                 {members.length > 1 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeMember(i)}
-                  >
+                  <Button variant="ghost" size="sm" onClick={() => removeMember(i)}>
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 )}
@@ -314,9 +284,7 @@ export default function NewApplicationPage() {
                     <input
                       type="checkbox"
                       checked={member.isEarning}
-                      onChange={(e) =>
-                        updateMember(i, "isEarning", e.target.checked)
-                      }
+                      onChange={(e) => updateMember(i, "isEarning", e.target.checked)}
                       className="rounded border-gray-300"
                     />
                     Earning member

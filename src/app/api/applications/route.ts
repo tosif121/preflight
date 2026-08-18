@@ -1,23 +1,23 @@
 import { NextRequest } from "next/server";
+import { getCurrentUser } from "@/lib/auth/server";
 import { createApplicationSchema } from "@/lib/schemas";
 import { applicationsRepository } from "@/lib/repositories/applications.repository";
 import { familyMembersRepository } from "@/lib/repositories/family-members.repository";
+import { rulePacksRepository } from "@/lib/repositories/rule-packs.repository";
 import { auditRepository } from "@/lib/repositories/audit.repository";
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const stateId = searchParams.get("stateId");
+  const user = await getCurrentUser();
+  if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-  let apps;
-  if (stateId) {
-    apps = await applicationsRepository.listByState(stateId);
-  } else {
-    apps = await applicationsRepository.listApplications();
-  }
+  const apps = await applicationsRepository.listByOperator(user.id);
   return Response.json(apps);
 }
 
 export async function POST(request: NextRequest) {
+  const user = await getCurrentUser();
+  if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+
   const body = await request.json();
   const parsed = createApplicationSchema.safeParse(body);
 
@@ -28,19 +28,22 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { citizenName, operatorName, intendedUseDeadline, familyMembers, stateId, serviceId } =
+  const { stateId, serviceId, citizenName, intendedUseDeadline, familyMembers } =
     parsed.data;
 
-  const application = await applicationsRepository.createApplication({
-    citizenName,
-    operatorName,
+  const latestPack = await rulePacksRepository.getLatestPublished(serviceId);
+
+  const application = await applicationsRepository.create({
+    operatorId: user.id,
     stateId,
     serviceId,
+    rulePackId: latestPack?.id ?? null,
+    citizenName,
     intendedUseDeadline: intendedUseDeadline ?? null,
   });
 
   for (const member of familyMembers) {
-    await familyMembersRepository.addFamilyMember({
+    await familyMembersRepository.add({
       applicationId: application.id,
       fullName: member.fullName,
       relation: member.relation,
@@ -50,15 +53,12 @@ export async function POST(request: NextRequest) {
 
   await auditRepository.logEvent(application.id, "application_created", {
     citizenName,
-    operatorName,
     stateId,
     serviceId,
     memberCount: familyMembers.length,
   });
 
-  const members = await familyMembersRepository.listByApplication(
-    application.id
-  );
+  const members = await familyMembersRepository.listByApplication(application.id);
 
   return Response.json({ application, members }, { status: 201 });
 }

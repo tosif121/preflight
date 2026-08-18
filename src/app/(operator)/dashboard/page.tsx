@@ -15,18 +15,14 @@ import {
   Send,
   ArrowRight,
 } from "lucide-react";
-import { getAuthUser, type AuthUser } from "@/lib/auth/client";
-import { getStateById } from "@/lib/config/catalog";
 
 interface Application {
   id: string;
   citizenName: string;
-  operatorName: string;
-  status: string;
-  state: string;
+  stateId: string;
   serviceId: string;
+  status: string;
   createdAt: string;
-  intendedUseDeadline: string | null;
 }
 
 const STATUS_CONFIG: Record<
@@ -42,38 +38,30 @@ const STATUS_CONFIG: Record<
 
 function formatServiceName(serviceId: string): string {
   return serviceId
-    .replace(/^rj_|^up_|^ka_/, "")
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase())
-    .replace(/Certificate$/, "Certificate");
+    .replace(/^(rj|up|ka)-/, "")
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [auth, setAuth] = useState<AuthUser | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const user = getAuthUser();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    setAuth(user);
-
-    fetch(`/api/applications?stateId=${user.stateId}`)
-      .then((r) => r.json())
+    fetch("/api/applications")
+      .then((r) => {
+        if (!r.ok) throw new Error("not authed");
+        return r.json();
+      })
       .then((data) => {
         setApplications(Array.isArray(data) ? data : []);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        router.push("/login");
+      });
   }, [router]);
-
-  if (!auth) return null;
-
-  const stateName = getStateById(auth.stateId)?.name ?? auth.stateId;
 
   return (
     <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -81,7 +69,7 @@ export default function DashboardPage() {
         <div>
           <h1 className="text-2xl font-bold">Applications</h1>
           <p className="text-sm text-muted-foreground">
-            {stateName} — {auth.role === "operator" ? "Service Operator" : "Citizen"} dashboard
+            Manage your service applications
           </p>
         </div>
         <Link href="/applications/new">
@@ -104,7 +92,7 @@ export default function DashboardPage() {
             <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
             <p className="text-lg font-medium">No applications yet</p>
             <p className="text-sm text-muted-foreground mb-4">
-              Create your first application in {stateName} to get started.
+              Create your first application to get started.
             </p>
             <Link href="/applications/new">
               <Button>
@@ -127,7 +115,7 @@ export default function DashboardPage() {
                     <div className="flex-1 min-w-0">
                       <p className="font-medium truncate">{app.citizenName}</p>
                       <p className="text-sm text-muted-foreground">
-                        {formatServiceName(app.serviceId)}
+                        {formatServiceName(app.serviceId)} · {app.stateId.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
                       </p>
                     </div>
                     <Badge variant={cfg.variant}>{cfg.label}</Badge>

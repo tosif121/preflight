@@ -6,8 +6,6 @@ import { documentsRepository } from "@/lib/repositories/documents.repository";
 import { checksRepository } from "@/lib/repositories/checks.repository";
 import { resolutionsRepository } from "@/lib/repositories/resolutions.repository";
 import { auditRepository } from "@/lib/repositories/audit.repository";
-import { statesRepository } from "@/lib/repositories/states.repository";
-import { servicesRepository } from "@/lib/repositories/services.repository";
 
 export async function GET(
   _request: NextRequest,
@@ -22,11 +20,6 @@ export async function GET(
     return Response.json({ error: "Application not found" }, { status: 404 });
   }
 
-  const [state, service] = await Promise.all([
-    statesRepository.findById(application.stateId),
-    servicesRepository.findById(application.serviceId),
-  ]);
-
   const members = await familyMembersRepository.listByApplication(id);
   const docs = await documentsRepository.listByApplication(id);
   const checks = await checksRepository.listByApplication(id);
@@ -34,11 +27,7 @@ export async function GET(
   const audit = await auditRepository.listByApplication(id);
 
   return Response.json({
-    application: {
-      ...application,
-      stateName: state?.name ?? application.stateId,
-      serviceName: service?.name ?? application.serviceId,
-    },
+    application,
     members,
     documents: docs,
     checks,

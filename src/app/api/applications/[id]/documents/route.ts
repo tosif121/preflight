@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { getCurrentUser } from "@/lib/auth/server";
 import { uploadDocumentSchema } from "@/lib/schemas";
 import { applicationsRepository } from "@/lib/repositories/applications.repository";
 import { documentsRepository } from "@/lib/repositories/documents.repository";
@@ -10,6 +11,9 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const user = await getCurrentUser();
+  if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+
   const { id } = await params;
   const body = await request.json();
   const parsed = uploadDocumentSchema.safeParse(body);
@@ -21,7 +25,7 @@ export async function POST(
     );
   }
 
-  const application = await applicationsRepository.getApplicationById(id);
+  const application = await applicationsRepository.findById(id);
   if (!application) {
     return Response.json({ error: "Application not found" }, { status: 404 });
   }
@@ -29,7 +33,7 @@ export async function POST(
   const { docType, familyMemberId, mockFileName } = parsed.data;
   const mockImageUrl = `/mock-docs/${mockFileName}`;
 
-  const doc = await documentsRepository.addDocument({
+  const doc = await documentsRepository.add({
     applicationId: id,
     familyMemberId: familyMemberId ?? null,
     docType,
@@ -51,20 +55,19 @@ export async function POST(
     normalized,
   };
 
-  await documentsRepository.updateOcrResult({
-    id: doc.id,
+  await documentsRepository.updateOcrResult(doc.id, {
     ocrStatus: "complete",
     ocrConfidence: ocrResult.overallConfidence,
     extractedData,
   });
 
-  await auditRepository.logEvent(id, "documents_uploaded", {
+  await auditRepository.logEvent(id, "document_uploaded", {
     documentId: doc.id,
     docType,
     mockFileName,
     ocrConfidence: ocrResult.overallConfidence,
   });
 
-  const updatedDoc = await documentsRepository.listByApplication(id);
-  return Response.json({ document: updatedDoc.find((d) => d.id === doc.id) });
+  const updatedDoc = await documentsRepository.findById(doc.id);
+  return Response.json({ document: updatedDoc });
 }

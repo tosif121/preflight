@@ -10,7 +10,7 @@ export interface AddFamilyMemberInput {
 }
 
 export const familyMembersRepository = {
-  async addFamilyMember(input: AddFamilyMemberInput): Promise<FamilyMember> {
+  async add(input: AddFamilyMemberInput): Promise<FamilyMember> {
     const rows = await db
       .insert(familyMembers)
       .values({
@@ -27,6 +27,12 @@ export const familyMembersRepository = {
     return db
       .select()
       .from(familyMembers)
+      .where(eq(familyMembers.applicationId, applicationId));
+  },
+
+  async deleteByApplication(applicationId: string): Promise<void> {
+    await db
+      .delete(familyMembers)
       .where(eq(familyMembers.applicationId, applicationId));
   },
 };

@@ -3,9 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ShieldCheck, LayoutDashboard, FileText, LogOut, MapPin } from "lucide-react";
-import { getAuthUser, clearAuthUser, type AuthUser } from "@/lib/auth/client";
-import { getStateById } from "@/lib/config/catalog";
+import { ShieldCheck, LayoutDashboard, FileText, LogOut } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -15,25 +13,24 @@ const NAV_ITEMS = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [auth, setAuth] = useState<AuthUser | null>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const user = getAuthUser();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    setAuth(user);
+    fetch("/api/auth/me")
+      .then((r) => {
+        if (!r.ok) throw new Error("not authed");
+        return r.json();
+      })
+      .then(() => setReady(true))
+      .catch(() => router.push("/login"));
   }, [router]);
 
-  const handleLogout = () => {
-    clearAuthUser();
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
   };
 
-  if (!auth) return null;
-
-  const stateName = getStateById(auth.stateId)?.name ?? auth.stateId;
+  if (!ready) return null;
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FDFBF7]">
@@ -47,10 +44,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               Pre<span className="text-[#C85A40]">flight</span>
             </span>
           </Link>
-          <div className="hidden sm:flex items-center gap-2 text-[10px] tracking-widest uppercase text-[#B0ACA8]">
-            <MapPin className="h-3 w-3" />
-            {stateName}
-          </div>
           <nav className="ml-auto flex items-center gap-1">
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
@@ -83,7 +76,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <main className="flex-1">{children}</main>
       <footer className="border-t border-[#EAE5DC] py-3 text-center text-xs text-[#B0ACA8] bg-[#FCF8F4]">
         Preflight is a pre-submission checker — not a government system. Final
-        verification stays with the department (Tehsildar).
+        verification stays with the department.
       </footer>
     </div>
   );

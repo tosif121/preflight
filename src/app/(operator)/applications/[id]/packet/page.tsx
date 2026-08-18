@@ -20,8 +20,9 @@ import {
 interface Application {
   id: string;
   citizenName: string;
-  operatorName: string;
   status: string;
+  stateName: string;
+  serviceName: string;
   intendedUseDeadline: string | null;
 }
 
@@ -164,15 +165,15 @@ export default function PacketPage() {
             </div>
             <div>
               <p className="text-muted-foreground">Operator</p>
-              <p className="font-medium">{app?.operatorName}</p>
+              <p className="font-medium">Current User</p>
             </div>
             <div>
               <p className="text-muted-foreground">Service</p>
-              <p className="font-medium">Family Income Certificate</p>
+              <p className="font-medium">{app?.serviceName}</p>
             </div>
             <div>
               <p className="text-muted-foreground">State</p>
-              <p className="font-medium">Rajasthan</p>
+              <p className="font-medium">{app?.stateName}</p>
             </div>
             {app?.intendedUseDeadline && (
               <div>
