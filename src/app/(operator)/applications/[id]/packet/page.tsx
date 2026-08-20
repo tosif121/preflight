@@ -16,6 +16,7 @@ import {
   ExternalLink,
   FileText,
 } from "lucide-react";
+import { ApplicationHealth } from "@/components/application-health";
 
 interface Application {
   id: string;
@@ -36,10 +37,17 @@ interface FamilyMember {
 
 interface Doc {
   id: string;
+  familyMemberId: string | null;
   docType: string;
   mockFileName: string;
   ocrStatus: string;
   ocrConfidence: number | null;
+}
+
+interface Check {
+  id: string;
+  severity: string;
+  status: string;
 }
 
 export default function PacketPage() {
@@ -50,6 +58,7 @@ export default function PacketPage() {
   const [app, setApp] = useState<Application | null>(null);
   const [members, setMembers] = useState<FamilyMember[]>([]);
   const [docs, setDocs] = useState<Doc[]>([]);
+  const [checks, setChecks] = useState<Check[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -60,6 +69,7 @@ export default function PacketPage() {
       setApp(data.application);
       setMembers(data.members ?? []);
       setDocs(data.documents ?? []);
+      setChecks(data.checks ?? []);
     }
     setLoading(false);
   }, [appId]);
@@ -111,23 +121,29 @@ export default function PacketPage() {
         <span className="text-sm">{app?.citizenName}</span>
       </div>
       <h1 className="text-2xl font-bold mb-1">
-        {isSubmitted ? "Application Submitted" : "Application Packet"}
+        {isSubmitted ? "Done!" : "Review & Submit"}
       </h1>
       <p className="text-sm text-muted-foreground mb-6">
-        Step 4: Review and submit the application.
+        Step 4: Check everything looks good, then submit.
       </p>
+
+      <ApplicationHealth
+        members={members}
+        docs={docs}
+        checks={checks}
+        requiredDocTypes={["identity_proof", "address_proof", "photo"]}
+        currentStep="packet"
+      />
 
       <Card className="mb-6 border-amber-300 bg-amber-50">
         <CardContent className="py-4 flex items-start gap-3">
           <ShieldCheck className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-medium text-amber-800">
-              Advisory — Not Official Verification
+              Quick check only
             </p>
             <p className="text-xs text-amber-700 mt-1">
-              Preflight checks are pre-submission quality checks only. Final
-              verification and approval remains with the department (Tehsildar).
-              This tool does not claim official government verification.
+              We check for common mistakes, but the department makes the final decision.
             </p>
           </div>
         </CardContent>
@@ -139,12 +155,10 @@ export default function PacketPage() {
             <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-medium text-green-800">
-                Application Submitted (Mock)
+                Submitted!
               </p>
               <p className="text-xs text-green-700 mt-1">
-                This is a prototype submission. No real government system was
-                contacted. The application would normally be forwarded to the
-                Tehsildar for final verification.
+                This is a demo. In real use, it would go to the department for review.
               </p>
             </div>
           </CardContent>
