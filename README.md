@@ -83,7 +83,7 @@ Push the schema to Neon:
 npx drizzle-kit push
 ```
 
-Seed the database with all 36 states, 360 services, and rule packs:
+Seed the database with all 36 states, 612 services, and rule packs:
 
 ```bash
 curl http://localhost:3000/api/seed
@@ -176,8 +176,8 @@ src/
 | Table | Purpose |
 |---|---|
 | `states` | 36 states/UTs with portal names |
-| `services` | 360 services (10 per state) with status badges |
-| `rule_packs` | Verification rules per service (verified or simplified) |
+| `services` | 612 services (17 per state) — all fully available |
+| `rule_packs` | Verification rules per service (auto-generated from templates) |
 | `operators` | Registered operators (phone + name) |
 | `otp_codes` | OTP verification codes |
 | `sessions` | Auth sessions (cookie-based) |
@@ -202,9 +202,9 @@ src/
 | `income_ceiling` | Warning | Income must be below pension/welfare threshold |
 | `bank_account_proof_present` | Blocker | Bank account proof required for pension disbursement |
 
-## Service Catalog — 36 States × 10 Services
+## Service Catalog — 36 States × 17 Services
 
-All 36 states and union territories are seeded with 10 services each (360 total):
+All 36 states and union territories are seeded with 17 services each (612 total), all fully available:
 
 | Service | Category | Template |
 |---|---|---|
@@ -213,15 +213,20 @@ All 36 states and union territories are seeded with 10 services each (360 total)
 | Domicile Certificate | Certificate | Certificate + residence proof |
 | Birth Certificate | Certificate | Vital event template |
 | Death Certificate | Certificate | Vital event template |
+| Marriage Certificate | Certificate | Standard certificate template |
+| EWS Certificate | Certificate | Standard certificate template |
+| Non-Creamy Layer Certificate | Certificate | Standard certificate template |
+| Agriculturist Certificate | Certificate | Standard certificate template |
+| Disability Certificate | Certificate | Standard certificate template |
 | Widow Pension | Pension | Pension + death certificate + bank proof |
 | Old Age Pension | Pension | Pension + age proof + bank proof |
 | Disability Pension | Pension | Pension + disability certificate + bank proof |
 | Ration Card | Welfare | Welfare registration template |
 | Scholarship Application | Welfare | Welfare registration template |
+| Driving License | Certificate | Standard certificate template |
+| Trade License | Certificate | Standard certificate template |
 
-**Maturity levels:**
-- **Rajasthan Family Income Certificate** — `verified`: hand-researched rule pack, production-ready
-- **All other services** — `simplified`: auto-generated from category templates, placeholder thresholds
+**Rajasthan Family Income Certificate** has a hand-researched, production-ready rule pack. All other services use auto-generated rule packs from category templates with placeholder thresholds.
 
 ## Mock vs Real
 
