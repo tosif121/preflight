@@ -24,6 +24,12 @@ import {
   Image,
 } from "lucide-react";
 
+interface MockDoc {
+  fileName: string;
+  label: string;
+  docType: string;
+}
+
 interface FamilyMember {
   id: string;
   fullName: string;
@@ -53,18 +59,6 @@ const DOC_TYPE_LABELS: Record<string, string> = {
   photo: "Passport Photo",
 };
 
-const MOCK_DOCS = [
-  { fileName: "aadhaar-clean.svg", label: "Aadhaar — Clean (Ramesh Kumar Sharma)", docType: "identity_proof" },
-  { fileName: "aadhaar-name-mismatch.svg", label: "Aadhaar — Name Mismatch (Ramesh K. Sharma)", docType: "identity_proof" },
-  { fileName: "address-proof-clean.svg", label: "Electricity Bill — Jaipur", docType: "address_proof" },
-  { fileName: "address-proof-mismatch.svg", label: "Rent Agreement — Jodhpur (Mismatch)", docType: "address_proof" },
-  { fileName: "salary-slip-ramesh.svg", label: "Salary Slip — Ramesh Kumar Sharma", docType: "income_proof_salaried" },
-  { fileName: "salary-slip-sunita.svg", label: "Salary Slip — Sunita Devi", docType: "income_proof_salaried" },
-  { fileName: "photo-passport.svg", label: "Passport Photo — Ramesh", docType: "photo" },
-  { fileName: "aadhaar-low-quality.svg", label: "Aadhaar — Low Quality (Priya)", docType: "identity_proof" },
-  { fileName: "itr-priya.svg", label: "ITR — Priya Sharma", docType: "income_proof_nonsalaried" },
-];
-
 export default function DocumentsPage() {
   const params = useParams();
   const router = useRouter();
@@ -73,19 +67,23 @@ export default function DocumentsPage() {
   const [app, setApp] = useState<Application | null>(null);
   const [members, setMembers] = useState<FamilyMember[]>([]);
   const [docs, setDocs] = useState<Document[]>([]);
+  const [mockDocs, setMockDocs] = useState<MockDoc[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState<string | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<string | null>(null);
-  const [selectedDocType, setSelectedDocType] = useState<string>("identity_proof");
 
   const fetchData = useCallback(async () => {
-    const res = await fetch(`/api/applications/${appId}`);
-    if (res.ok) {
-      const data = await res.json();
+    const [appRes, mockRes] = await Promise.all([
+      fetch(`/api/applications/${appId}`),
+      fetch("/api/mock-docs"),
+    ]);
+    if (appRes.ok) {
+      const data = await appRes.json();
       setApp(data.application);
       setMembers(data.members ?? []);
       setDocs(data.documents ?? []);
+    }
+    if (mockRes.ok) {
+      setMockDocs(await mockRes.json());
     }
     setLoading(false);
   }, [appId]);
@@ -97,14 +95,9 @@ export default function DocumentsPage() {
   const handleUpload = async (mockFileName: string, docType: string, memberHint?: string) => {
     setUploading(mockFileName);
     try {
-      const body: Record<string, unknown> = {
-        docType,
-        mockFileName,
-      };
-      const targetMember = memberHint ?? selectedMember;
-      if (targetMember) {
-        body.familyMemberId = targetMember;
-      }
+      const body: Record<string, unknown> = { docType, mockFileName };
+      const targetMember = memberHint;
+      if (targetMember) body.familyMemberId = targetMember;
 
       const res = await fetch(`/api/applications/${appId}/documents`, {
         method: "POST",
@@ -119,7 +112,6 @@ export default function DocumentsPage() {
 
       toast.success("Document uploaded and OCR processed");
       await fetchData();
-      setDialogOpen(false);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Upload failed");
     } finally {
@@ -129,15 +121,12 @@ export default function DocumentsPage() {
 
   const getDocsForMember = (memberId: string) =>
     docs.filter((d) => d.familyMemberId === memberId);
-  const getGeneralDocs = () => docs.filter((d) => !d.familyMemberId);
 
   const requiredDocs = [
     ...members.flatMap((m) => [
       { docType: "identity_proof", memberId: m.id, label: `Identity Proof — ${m.fullName}` },
       ...(m.isEarning
-        ? [
-            { docType: "income_proof_salaried", memberId: m.id, label: `Income Proof — ${m.fullName}` },
-          ]
+        ? [{ docType: "income_proof_salaried", memberId: m.id, label: `Income Proof — ${m.fullName}` }]
         : []),
     ]),
     { docType: "address_proof", memberId: null, label: "Address Proof" },
@@ -157,7 +146,7 @@ export default function DocumentsPage() {
 
   if (loading) {
     return (
-    <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />
@@ -166,6 +155,8 @@ export default function DocumentsPage() {
       </div>
     );
   }
+
+  const memberDocTypes = ["identity_proof", "income_proof_salaried", "income_proof_nonsalaried"];
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">
@@ -178,7 +169,7 @@ export default function DocumentsPage() {
       </div>
       <h1 className="text-2xl font-bold mb-1">Upload Documents</h1>
       <p className="text-sm text-muted-foreground mb-6">
-        Step 2: Attach mock documents for each family member and general requirements.
+        Step 2: Attach documents for each family member and general requirements.
         <span className="ml-1 font-medium">
           {uploadedCount}/{requiredDocs.length} uploaded
         </span>
@@ -197,12 +188,8 @@ export default function DocumentsPage() {
                 <CardHeader className="py-3">
                   <CardTitle className="text-sm flex items-center gap-2">
                     {member.fullName}
-                    <Badge variant="secondary" className="text-xs">
-                      {member.relation}
-                    </Badge>
-                    {member.isEarning && (
-                      <Badge variant="default" className="text-xs">Earning</Badge>
-                    )}
+                    <Badge variant="secondary" className="text-xs">{member.relation}</Badge>
+                    {member.isEarning && <Badge variant="default" className="text-xs">Earning</Badge>}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="py-2 space-y-2">
@@ -235,38 +222,27 @@ export default function DocumentsPage() {
                     />
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>
-                          Upload Document for {member.fullName}
-                        </DialogTitle>
+                        <DialogTitle>Upload Document for {member.fullName}</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-2 max-h-80 overflow-y-auto">
-                        {MOCK_DOCS.filter(
-                          (d) =>
-                            d.docType === "identity_proof" ||
-                            d.docType === "income_proof_salaried" ||
-                            d.docType === "income_proof_nonsalaried"
-                        ).map((mock) => (
-                          <button
-                            key={mock.fileName}
-                            onClick={() =>
-                              handleUpload(mock.fileName, mock.docType, member.id)
-                            }
-                            disabled={uploading !== null}
-                            className="w-full text-left p-3 rounded-lg border hover:border-primary hover:bg-primary/5 transition-colors disabled:opacity-50"
-                          >
-                            <div className="flex items-center gap-2">
-                              <FileText className="h-4 w-4 shrink-0" />
-                              <div className="min-w-0">
-                                <p className="text-sm font-medium truncate">
-                                  {mock.label}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  {DOC_TYPE_LABELS[mock.docType]}
-                                </p>
+                        {mockDocs
+                          .filter((d) => memberDocTypes.includes(d.docType))
+                          .map((mock) => (
+                            <button
+                              key={mock.fileName}
+                              onClick={() => handleUpload(mock.fileName, mock.docType, member.id)}
+                              disabled={uploading !== null}
+                              className="w-full text-left p-3 rounded-lg border hover:border-primary hover:bg-primary/5 transition-colors disabled:opacity-50"
+                            >
+                              <div className="flex items-center gap-2">
+                                <FileText className="h-4 w-4 shrink-0" />
+                                <div className="min-w-0">
+                                  <p className="text-sm font-medium truncate">{mock.label}</p>
+                                  <p className="text-xs text-muted-foreground">{DOC_TYPE_LABELS[mock.docType]}</p>
+                                </div>
                               </div>
-                            </div>
-                          </button>
-                        ))}
+                            </button>
+                          ))}
                       </div>
                     </DialogContent>
                   </Dialog>
@@ -285,9 +261,7 @@ export default function DocumentsPage() {
             { docType: "address_proof", label: "Address Proof" },
             { docType: "photo", label: "Passport Photo" },
           ].map((req) => {
-            const existing = docs.find(
-              (d) => d.docType === req.docType && !d.familyMemberId
-            );
+            const existing = docs.find((d) => d.docType === req.docType && !d.familyMemberId);
             return (
               <Card key={req.docType}>
                 <CardContent className="py-4 flex items-center justify-between">
@@ -316,8 +290,9 @@ export default function DocumentsPage() {
                         <DialogTitle>Select {req.label}</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-2 max-h-80 overflow-y-auto">
-                        {MOCK_DOCS.filter((d) => d.docType === req.docType).map(
-                          (mock) => (
+                        {mockDocs
+                          .filter((d) => d.docType === req.docType)
+                          .map((mock) => (
                             <button
                               key={mock.fileName}
                               onClick={() => handleUpload(mock.fileName, mock.docType)}
@@ -329,8 +304,7 @@ export default function DocumentsPage() {
                                 <span className="text-sm">{mock.label}</span>
                               </div>
                             </button>
-                          )
-                        )}
+                          ))}
                       </div>
                     </DialogContent>
                   </Dialog>
@@ -342,14 +316,11 @@ export default function DocumentsPage() {
           <Card className="mt-6 border-dashed">
             <CardContent className="py-4">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium">
-                  Uploaded Documents ({docs.length})
-                </span>
+                <span className="text-sm font-medium">Uploaded Documents ({docs.length})</span>
               </div>
               {docs.length === 0 ? (
                 <p className="text-xs text-muted-foreground">
-                  No documents uploaded yet. Start by uploading identity proofs for
-                  each family member.
+                  No documents uploaded yet. Start by uploading identity proofs for each family member.
                 </p>
               ) : (
                 <div className="space-y-1">
@@ -357,9 +328,7 @@ export default function DocumentsPage() {
                     <div key={d.id} className="flex items-center gap-2 text-xs">
                       <CheckCircle2 className="h-3 w-3 text-green-600" />
                       <span className="truncate">{d.mockFileName}</span>
-                      <Badge variant="outline" className="text-[10px] ml-auto">
-                        {DOC_TYPE_LABELS[d.docType]}
-                      </Badge>
+                      <Badge variant="outline" className="text-[10px] ml-auto">{DOC_TYPE_LABELS[d.docType]}</Badge>
                     </div>
                   ))}
                 </div>

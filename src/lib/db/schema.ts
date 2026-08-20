@@ -229,6 +229,7 @@ export const documents = pgTable("documents", {
   }).notNull(),
   mockFileName: text("mock_file_name").notNull(),
   mockImageUrl: text("mock_image_url").notNull(),
+  s3Key: text("s3_key"),
   ocrStatus: text("ocr_status", {
     enum: ["pending", "complete", "failed"],
   })

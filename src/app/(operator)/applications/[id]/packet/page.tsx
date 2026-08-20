@@ -20,6 +20,7 @@ import {
 interface Application {
   id: string;
   citizenName: string;
+  operatorName: string;
   status: string;
   stateName: string;
   serviceName: string;
@@ -165,7 +166,7 @@ export default function PacketPage() {
             </div>
             <div>
               <p className="text-muted-foreground">Operator</p>
-              <p className="font-medium">Current User</p>
+              <p className="font-medium">{app?.operatorName}</p>
             </div>
             <div>
               <p className="text-muted-foreground">Service</p>

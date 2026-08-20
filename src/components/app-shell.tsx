@@ -22,12 +22,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         return r.json();
       })
       .then(() => setReady(true))
-      .catch(() => router.push("/login"));
+      .catch(() => router.push("/"));
   }, [router]);
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/login");
+    router.push("/");
   };
 
   if (!ready) return null;

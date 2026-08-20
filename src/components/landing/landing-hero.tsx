@@ -1,9 +1,10 @@
 "use client";
 
-import { ArrowRight, CheckCircle2, FileSearch, MapPin } from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
+import { useState } from "react";
+import { ArrowRight, CheckCircle2, FileSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SignInModal } from "@/components/sign-in-modal";
+import Image from "next/image";
 
 const POINTS = [
   "Catch document errors before submission",
@@ -11,18 +12,13 @@ const POINTS = [
   "Zero blockers = ready to submit",
 ];
 
-const STATE_NAMES = ["Rajasthan", "Uttar Pradesh", "Karnataka"];
-
 export default function LandingHero() {
+  const [modalOpen, setModalOpen] = useState(false);
+
   return (
     <section className="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-32 flex flex-col justify-center overflow-hidden">
       <div className="relative grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
         <div className="order-2 lg:order-1">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#EAE5DC] text-[13px] font-medium text-[#C85A40] mb-7 tracking-wide">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#C85A40] animate-pulse" />
-            Pre-submission quality checks — {STATE_NAMES.length} states
-          </div>
-
           <h1
             className="font-bold tracking-tight leading-[1.08] text-[#1C1B1A] mb-5"
             style={{ fontSize: "clamp(32px, 5.5vw, 64px)" }}
@@ -69,39 +65,25 @@ export default function LandingHero() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-8 sm:max-w-xl">
-            <Link href="/login">
-              <Button
-                size="lg"
-                className="w-full sm:w-auto bg-[#C85A40] hover:bg-[#A84C36] text-white shadow-[0_4px_16px_rgba(200,90,64,0.35)] hover:shadow-[0_6px_20px_rgba(200,90,64,0.45)] transition-all"
-              >
-                <FileSearch className="h-4 w-4 mr-2" />
-                Get Started
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            </Link>
+            <Button
+              size="lg"
+              onClick={() => setModalOpen(true)}
+              className="w-full sm:w-auto bg-[#C85A40] hover:bg-[#A84C36] text-white shadow-[0_4px_16px_rgba(200,90,64,0.35)] hover:shadow-[0_6px_20px_rgba(200,90,64,0.45)] transition-all py-3 px-6 text-base"
+            >
+              <FileSearch className="h-4 w-4 mr-2" />
+              Get Started
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
 
-            <Link href="/login">
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full sm:w-auto border-[#EAE5DC] text-[#1C1B1A] hover:bg-[#F5F2EB]"
-              >
-                View Dashboard
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            </Link>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            {STATE_NAMES.map((name) => (
-              <div
-                key={name}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#EAE5DC] text-xs font-medium text-[#7A7771]"
-              >
-                <MapPin size={11} className="text-[#C85A40]" />
-                {name}
-              </div>
-            ))}
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => setModalOpen(true)}
+              className="w-full sm:w-auto border-[#EAE5DC] text-[#1C1B1A] hover:bg-[#F5F2EB] py-3 px-6 text-base"
+            >
+              View Dashboard
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
           </div>
         </div>
 
@@ -120,6 +102,8 @@ export default function LandingHero() {
           </div>
         </div>
       </div>
+
+      <SignInModal open={modalOpen} onOpenChange={setModalOpen} />
     </section>
   );
 }

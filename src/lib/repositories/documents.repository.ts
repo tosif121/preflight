@@ -22,6 +22,7 @@ export interface AddDocumentInput {
   docType: DocType;
   mockFileName: string;
   mockImageUrl: string;
+  s3Key?: string | null;
 }
 
 export const documentsRepository = {
@@ -34,6 +35,7 @@ export const documentsRepository = {
         docType: input.docType,
         mockFileName: input.mockFileName,
         mockImageUrl: input.mockImageUrl,
+        s3Key: input.s3Key ?? null,
       })
       .returning();
     return rows[0];

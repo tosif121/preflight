@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ShieldCheck, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SignInModal } from "@/components/sign-in-modal";
 
 const NAV_LINKS = [
   { label: "Features", href: "/#features" },
@@ -14,12 +15,15 @@ const NAV_LINKS = [
 export default function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     const updateScrolled = () => setScrolled(window.scrollY > 12);
     window.addEventListener("scroll", updateScrolled, { passive: true });
     return () => window.removeEventListener("scroll", updateScrolled);
   }, []);
+
+  const openModal = () => { setOpen(false); setModalOpen(true); };
 
   return (
     <>
@@ -57,25 +61,23 @@ export default function LandingNavbar() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
-            <Link href="/login">
-              <Button
-                size="sm"
-                className="bg-[#C85A40] hover:bg-[#A84C36] text-white"
-              >
-                Sign In
-              </Button>
-            </Link>
+            <Button
+              size="sm"
+              onClick={() => setModalOpen(true)}
+              className="bg-[#C85A40] hover:bg-[#A84C36] text-white"
+            >
+              Sign In
+            </Button>
           </div>
 
           <div className="md:hidden flex items-center gap-2">
-            <Link href="/login">
-              <Button
-                size="sm"
-                className="text-xs px-3 bg-[#C85A40] hover:bg-[#A84C36] text-white"
-              >
-                Sign In
-              </Button>
-            </Link>
+            <Button
+              size="sm"
+              onClick={() => setModalOpen(true)}
+              className="text-xs px-3 bg-[#C85A40] hover:bg-[#A84C36] text-white"
+            >
+              Sign In
+            </Button>
             <button
               className="w-10 h-10 flex items-center justify-center rounded-full bg-black/5 transition-all active:scale-95 hover:bg-black/10"
               onClick={() => setOpen(!open)}
@@ -149,15 +151,18 @@ export default function LandingNavbar() {
             </nav>
 
             <div className="px-4 py-4 border-t border-[#EAE5DC]">
-              <Link href="/login" onClick={() => setOpen(false)}>
-                <Button className="w-full bg-[#C85A40] hover:bg-[#A84C36] text-white">
-                  Sign In
-                </Button>
-              </Link>
+              <Button
+                onClick={openModal}
+                className="w-full bg-[#C85A40] hover:bg-[#A84C36] text-white"
+              >
+                Sign In
+              </Button>
             </div>
           </div>
         </>
       )}
+
+      <SignInModal open={modalOpen} onOpenChange={setModalOpen} />
     </>
   );
 }

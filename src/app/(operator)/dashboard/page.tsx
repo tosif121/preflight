@@ -59,7 +59,7 @@ export default function DashboardPage() {
         setLoading(false);
       })
       .catch(() => {
-        router.push("/login");
+        router.push("/");
       });
   }, [router]);
 

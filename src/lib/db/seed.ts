@@ -6,175 +6,114 @@ import {
   operators,
 } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import {
+  certificateTemplate,
+  vitalEventCertificateTemplate,
+  pensionTemplate,
+  welfareRegistrationTemplate,
+} from "@/lib/rules/templates";
 
 const SEED_STATES = [
-  { id: "rajasthan", name: "Rajasthan", code: "RJ", portalName: "eMitra", portalUrl: "https://emitra.rajasthan.gov.in", status: "active" as const },
-  { id: "uttar_pradesh", name: "Uttar Pradesh", code: "UP", portalName: "e-District", portalUrl: "https://edistrict.up.gov.in", status: "active" as const },
+  { id: "andhra_pradesh", name: "Andhra Pradesh", code: "AP", portalName: "MeeSeva", portalUrl: "https://meeseva.ap.gov.in", status: "active" as const },
+  { id: "arunachal_pradesh", name: "Arunachal Pradesh", code: "AR", portalName: "ArunOnline", portalUrl: "https://arunonline.gov.in", status: "active" as const },
+  { id: "assam", name: "Assam", code: "AS", portalName: "Sewa Setu", portalUrl: "https://sewasetu.assam.gov.in", status: "active" as const },
+  { id: "bihar", name: "Bihar", code: "BR", portalName: "RTPS", portalUrl: "https://serviceonline.bihar.gov.in", status: "active" as const },
+  { id: "chhattisgarh", name: "Chhattisgarh", code: "CG", portalName: "e-District", portalUrl: "https://edistrict.cgstate.gov.in", status: "active" as const },
+  { id: "goa", name: "Goa", code: "GA", portalName: "Goa Online", portalUrl: "https://goaonline.gov.in", status: "active" as const },
+  { id: "gujarat", name: "Gujarat", code: "GJ", portalName: "Digital Seva", portalUrl: "https://digitalseva.gujarat.gov.in", status: "active" as const },
+  { id: "haryana", name: "Haryana", code: "HR", portalName: "Antyodaya SARAL", portalUrl: "https://saralharyana.gov.in", status: "active" as const },
+  { id: "himachal_pradesh", name: "Himachal Pradesh", code: "HP", portalName: "e-District", portalUrl: "https://edistrict.hp.gov.in", status: "active" as const },
+  { id: "jharkhand", name: "Jharkhand", code: "JH", portalName: "Jharsewa", portalUrl: "https://jharsewa.jharkhand.gov.in", status: "active" as const },
   { id: "karnataka", name: "Karnataka", code: "KA", portalName: "Seva Sindhu", portalUrl: "https://sevasindhu.karnataka.gov.in", status: "active" as const },
+  { id: "kerala", name: "Kerala", code: "KL", portalName: "e-District", portalUrl: "https://edistrict.kerala.gov.in", status: "active" as const },
+  { id: "madhya_pradesh", name: "Madhya Pradesh", code: "MP", portalName: "MP e-District", portalUrl: "https://mpedistrict.gov.in", status: "active" as const },
+  { id: "maharashtra", name: "Maharashtra", code: "MH", portalName: "Aaple Sarkar", portalUrl: "https://aaplesarkar.mahaonline.gov.in", status: "active" as const },
+  { id: "manipur", name: "Manipur", code: "MN", portalName: "e-District", portalUrl: "https://edistrict.manipur.gov.in", status: "active" as const },
+  { id: "meghalaya", name: "Meghalaya", code: "ML", portalName: "Meghalaya Services", portalUrl: "https://meghalaya.gov.in", status: "active" as const },
+  { id: "mizoram", name: "Mizoram", code: "MZ", portalName: "e-District", portalUrl: "https://edistrict.mizoram.gov.in", status: "active" as const },
+  { id: "nagaland", name: "Nagaland", code: "NL", portalName: "e-District", portalUrl: "https://edistrict.nagaland.gov.in", status: "active" as const },
+  { id: "odisha", name: "Odisha", code: "OR", portalName: "e-District", portalUrl: "https://edistrict.odisha.gov.in", status: "active" as const },
+  { id: "punjab", name: "Punjab", code: "PB", portalName: "Sewa Kendra", portalUrl: "https://saral Punjab.gov.in", status: "active" as const },
+  { id: "rajasthan", name: "Rajasthan", code: "RJ", portalName: "eMitra", portalUrl: "https://emitra.rajasthan.gov.in", status: "active" as const },
+  { id: "sikkim", name: "Sikkim", code: "SK", portalName: "e-Services", portalUrl: "https://sikkim.gov.in", status: "active" as const },
+  { id: "tamil_nadu", name: "Tamil Nadu", code: "TN", portalName: "e-Sevai", portalUrl: "https://esevai.tn.gov.in", status: "active" as const },
+  { id: "telangana", name: "Telangana", code: "TS", portalName: "MeeSeva", portalUrl: "https://meeseva.telangana.gov.in", status: "active" as const },
+  { id: "tripura", name: "Tripura", code: "TR", portalName: "e-District", portalUrl: "https://edistrict.tripura.gov.in", status: "active" as const },
+  { id: "uttar_pradesh", name: "Uttar Pradesh", code: "UP", portalName: "e-District", portalUrl: "https://edistrict.up.gov.in", status: "active" as const },
+  { id: "uttarakhand", name: "Uttarakhand", code: "UK", portalName: "e-District", portalUrl: "https://edistrict.uk.gov.in", status: "active" as const },
+  { id: "west_bengal", name: "West Bengal", code: "WB", portalName: "Paras", portalUrl: "https://paras.wb.gov.in", status: "active" as const },
+  { id: "andaman_nicobar", name: "Andaman & Nicobar Islands", code: "AN", portalName: "e-District", portalUrl: "https://andaman.gov.in", status: "active" as const },
+  { id: "chandigarh", name: "Chandigarh", code: "CH", portalName: "e-District", portalUrl: "https://chandigarh.gov.in", status: "active" as const },
+  { id: "dadra_nagar_haveli", name: "Dadra & Nagar Haveli and Daman & Diu", code: "DD", portalName: "e-District", portalUrl: "https://dnh.gov.in", status: "active" as const },
+  { id: "delhi", name: "Delhi", code: "DL", portalName: "e-District Delhi", portalUrl: "https://edistrict.delhigovt.nic.in", status: "active" as const },
+  { id: "jammu_kashmir", name: "Jammu & Kashmir", code: "JK", portalName: "e-District", portalUrl: "https://edistrict.jk.gov.in", status: "active" as const },
+  { id: "ladakh", name: "Ladakh", code: "LA", portalName: "e-District", portalUrl: "https://ladakh.gov.in", status: "active" as const },
+  { id: "lakshadweep", name: "Lakshadweep", code: "LD", portalName: "e-District", portalUrl: "https://lakshadweep.gov.in", status: "active" as const },
+  { id: "puducherry", name: "Puducherry", code: "PY", portalName: "e-District", portalUrl: "https://py.gov.in", status: "active" as const },
 ];
 
-const SEED_SERVICES = [
-  // Rajasthan
-  { id: "rj-family-income", stateId: "rajasthan", name: "Family Income Certificate", slug: "family-income", category: "certificate" as const, description: "Verify income for family welfare schemes, scholarships, and subsidies", status: "live" as const },
-  { id: "rj-caste", stateId: "rajasthan", name: "Caste Certificate", slug: "caste", category: "certificate" as const, description: "SC/ST/OBC caste verification for reservation benefits", status: "beta" as const },
-  { id: "rj-domicile", stateId: "rajasthan", name: "Mool Niwas (Domicile)", slug: "domicile", category: "certificate" as const, description: "Proof of residence in Rajasthan for state schemes", status: "beta" as const },
-  { id: "rj-birth", stateId: "rajasthan", name: "Birth Certificate", slug: "birth", category: "certificate" as const, description: "Official birth registration and certificate", status: "coming_soon" as const },
-  { id: "rj-death", stateId: "rajasthan", name: "Death Certificate", slug: "death", category: "certificate" as const, description: "Official death registration and certificate", status: "coming_soon" as const },
-  { id: "rj-widow-pension", stateId: "rajasthan", name: "Widow Pension", slug: "widow-pension", category: "pension" as const, description: "Monthly pension eligibility for widows under state welfare", status: "beta" as const },
-  { id: "rj-old-age-pension", stateId: "rajasthan", name: "Old Age Pension", slug: "old-age-pension", category: "pension" as const, description: "Monthly pension for senior citizens below income threshold", status: "beta" as const },
-  // Uttar Pradesh
-  { id: "up-income", stateId: "uttar_pradesh", name: "Income Certificate", slug: "income", category: "certificate" as const, description: "Income verification for scholarships, fee waivers, and subsidies", status: "beta" as const },
-  { id: "up-caste", stateId: "uttar_pradesh", name: "Caste Certificate", slug: "caste", category: "certificate" as const, description: "SC/ST/OBC caste verification for reservation benefits", status: "beta" as const },
-  { id: "up-domicile", stateId: "uttar_pradesh", name: "Domicile Certificate", slug: "domicile", category: "certificate" as const, description: "Proof of residence in Uttar Pradesh for state schemes", status: "beta" as const },
-  { id: "up-birth", stateId: "uttar_pradesh", name: "Birth Certificate", slug: "birth", category: "certificate" as const, description: "Official birth registration and certificate", status: "coming_soon" as const },
-  { id: "up-death", stateId: "uttar_pradesh", name: "Death Certificate", slug: "death", category: "certificate" as const, description: "Official death registration and certificate", status: "coming_soon" as const },
-  // Karnataka
-  { id: "ka-income", stateId: "karnataka", name: "Income Certificate", slug: "income", category: "certificate" as const, description: "Income verification for social welfare and education schemes", status: "beta" as const },
-  { id: "ka-caste", stateId: "karnataka", name: "Caste Certificate", slug: "caste", category: "certificate" as const, description: "Caste verification for reservation and welfare benefits", status: "beta" as const },
-  { id: "ka-residence", stateId: "karnataka", name: "Residence Certificate", slug: "residence", category: "certificate" as const, description: "Proof of residence in Karnataka for state schemes", status: "beta" as const },
-  { id: "ka-birth", stateId: "karnataka", name: "Birth Certificate", slug: "birth", category: "certificate" as const, description: "Official birth registration and certificate", status: "coming_soon" as const },
-  { id: "ka-death", stateId: "karnataka", name: "Death Certificate", slug: "death", category: "certificate" as const, description: "Official death registration and certificate", status: "coming_soon" as const },
+interface ServiceDef {
+  slug: string;
+  name: string;
+  category: "certificate" | "pension" | "welfare";
+  description: string;
+  template: "certificate" | "vital_event" | "pension" | "welfare";
+  extraDocType?: string;
+}
+
+const SERVICE_CATALOG: ServiceDef[] = [
+  { slug: "income", name: "Income Certificate", category: "certificate", description: "Income verification for scholarships, fee waivers, and subsidies", template: "certificate" },
+  { slug: "caste", name: "Caste Certificate", category: "certificate", description: "SC/ST/OBC caste verification for reservation benefits", template: "certificate" },
+  { slug: "domicile", name: "Domicile Certificate", category: "certificate", description: "Proof of residence for state schemes", template: "certificate" },
+  { slug: "birth", name: "Birth Certificate", category: "certificate", description: "Official birth registration and certificate", template: "vital_event" },
+  { slug: "death", name: "Death Certificate", category: "certificate", description: "Official death registration and certificate", template: "vital_event" },
+  { slug: "widow-pension", name: "Widow Pension", category: "pension", description: "Monthly pension eligibility for widows under state welfare", template: "pension", extraDocType: "death_certificate" },
+  { slug: "old-age-pension", name: "Old Age Pension", category: "pension", description: "Monthly pension for senior citizens below income threshold", template: "pension" },
+  { slug: "disability-pension", name: "Disability Pension", category: "pension", description: "Monthly pension for persons with disabilities", template: "pension" },
+  { slug: "ration-card", name: "Ration Card", category: "welfare", description: "Public distribution system ration card registration", template: "welfare" },
+  { slug: "scholarship", name: "Scholarship Application", category: "welfare", description: "State scholarship application for eligible students", template: "welfare" },
 ];
 
-function makeRjIncomeRules() {
-  return {
-    id: "rj-family-income",
-    name: "Rajasthan Family Income Certificate",
-    prerequisites: ["Jan Aadhaar family record must be available", "All earning family members must have income proof"],
-    required_documents: [
-      { doc_type: "identity_proof", scope: "per_member", description: "Aadhaar or equivalent identity proof for each family member" },
-      { doc_type: "address_proof", scope: "per_application", description: "Address proof (utility bill, rent agreement, or address on Aadhaar)" },
-      { doc_type: "income_proof_salaried", scope: "per_earning_member", description: "Salary slip, Form 16, or employer letter for salaried earning members" },
-      { doc_type: "income_proof_nonsalaried", scope: "per_earning_member", description: "ITR, bank statement, or self-declaration for non-salaried earning members" },
-      { doc_type: "photo", scope: "per_application", description: "Passport-size photo of the primary applicant" },
-    ],
-    cross_checks: [
-      { id: "name_consistency", severity: "blocker", description: "Name on identity proof must match name on income proof and application", check_type: "consistency" },
-      { id: "address_consistency", severity: "warning", description: "Address on identity proof should match address proof", check_type: "consistency" },
-      { id: "income_coverage", severity: "blocker", description: "Every earning family member must have at least one income proof document", check_type: "completeness" },
-      { id: "certificate_use_by_date", severity: "blocker", description: "Intended use deadline must fall within 12 months from today", check_type: "validity" },
-      { id: "document_quality", severity: "warning", description: "Document OCR confidence should be above 0.75 for reliable extraction", check_type: "quality" },
-    ],
-  };
-}
+// Rajasthan Family Income Certificate is the ONLY verified, hand-researched pack
+const VERIFIED_SERVICES: Record<string, Record<string, { name: string; rules: unknown }>> = {
+  rajasthan: {
+    "family-income": {
+      name: "Family Income Certificate",
+      rules: {
+        id: "rj-family-income",
+        name: "Rajasthan Family Income Certificate",
+        prerequisites: ["Jan Aadhaar family record must be available", "All earning family members must have income proof"],
+        required_documents: [
+          { doc_type: "identity_proof", scope: "per_member", description: "Aadhaar or equivalent identity proof for each family member" },
+          { doc_type: "address_proof", scope: "per_application", description: "Address proof (utility bill, rent agreement, or address on Aadhaar)" },
+          { doc_type: "income_proof_salaried", scope: "per_earning_member", description: "Salary slip, Form 16, or employer letter for salaried earning members" },
+          { doc_type: "income_proof_nonsalaried", scope: "per_earning_member", description: "ITR, bank statement, or self-declaration for non-salaried earning members" },
+          { doc_type: "photo", scope: "per_application", description: "Passport-size photo of the primary applicant" },
+        ],
+        cross_checks: [
+          { id: "name_consistency", severity: "blocker", description: "Name on identity proof must match name on income proof and application", check_type: "consistency" },
+          { id: "address_consistency", severity: "warning", description: "Address on identity proof should match address proof", check_type: "consistency" },
+          { id: "income_coverage", severity: "blocker", description: "Every earning family member must have at least one income proof document", check_type: "completeness" },
+          { id: "certificate_use_by_date", severity: "blocker", description: "Intended use deadline must fall within 12 months from today", check_type: "validity" },
+          { id: "document_quality", severity: "warning", description: "Document OCR confidence should be above 0.75 for reliable extraction", check_type: "quality" },
+        ],
+      },
+    },
+  },
+};
 
-function makeGenericIncomeRules(stateId: string, name: string) {
-  return {
-    id: `${stateId}-income`,
-    name,
-    prerequisites: ["Applicant must be a resident of the state", "Income proof required for all earning members"],
-    required_documents: [
-      { doc_type: "identity_proof", scope: "per_member", description: "Aadhaar or equivalent identity proof" },
-      { doc_type: "address_proof", scope: "per_application", description: "Address proof for state residence" },
-      { doc_type: "income_proof_salaried", scope: "per_earning_member", description: "Salary slip, Form 16, or employer letter" },
-      { doc_type: "income_proof_nonsalaried", scope: "per_earning_member", description: "ITR, bank statement, or self-declaration" },
-      { doc_type: "photo", scope: "per_application", description: "Passport-size photo of the primary applicant" },
-    ],
-    cross_checks: [
-      { id: "name_consistency", severity: "blocker", description: "Name must match across identity and income proof", check_type: "consistency" },
-      { id: "address_consistency", severity: "warning", description: "Address should match across documents", check_type: "consistency" },
-      { id: "income_coverage", severity: "blocker", description: "Every earning member must have income proof", check_type: "completeness" },
-      { id: "certificate_use_by_date", severity: "blocker", description: "Use deadline within 12 months", check_type: "validity" },
-      { id: "document_quality", severity: "warning", description: "OCR confidence above 0.75", check_type: "quality" },
-    ],
-  };
+function generateRules(stateName: string, svc: ServiceDef) {
+  switch (svc.template) {
+    case "certificate":
+      return certificateTemplate(`${stateName} ${svc.name}`, svc.extraDocType);
+    case "vital_event":
+      return vitalEventCertificateTemplate(`${stateName} ${svc.name}`);
+    case "pension":
+      return pensionTemplate(`${stateName} ${svc.name}`, svc.extraDocType);
+    case "welfare":
+      return welfareRegistrationTemplate(`${stateName} ${svc.name}`);
+  }
 }
-
-function makeCasteRules(stateId: string) {
-  return {
-    id: `${stateId}-caste`,
-    name: "Caste Certificate",
-    prerequisites: ["Applicant must belong to SC/ST/OBC category", "Community reference required"],
-    required_documents: [
-      { doc_type: "identity_proof", scope: "per_member", description: "Aadhaar or equivalent identity proof" },
-      { doc_type: "address_proof", scope: "per_application", description: "Address proof" },
-      { doc_type: "prior_caste_certificate", scope: "per_application", description: "Parent's or relative's prior caste certificate or community reference" },
-      { doc_type: "photo", scope: "per_application", description: "Passport-size photo" },
-    ],
-    cross_checks: [
-      { id: "name_consistency", severity: "blocker", description: "Name must match across identity and caste proof", check_type: "consistency" },
-      { id: "lineage_reference_present", severity: "blocker", description: "A prior family caste reference document is required", check_type: "completeness" },
-      { id: "document_quality", severity: "warning", description: "OCR confidence above 0.75", check_type: "quality" },
-    ],
-  };
-}
-
-function makeDomicileRules(stateId: string) {
-  return {
-    id: `${stateId}-domicile`,
-    name: "Domicile / Residence Certificate",
-    prerequisites: ["Applicant must have resided in the state for required duration", "Residence proof required"],
-    required_documents: [
-      { doc_type: "identity_proof", scope: "per_member", description: "Aadhaar or equivalent identity proof" },
-      { doc_type: "address_proof", scope: "per_application", description: "Utility bill, rent agreement, or address on Aadhaar" },
-      { doc_type: "residence_proof", scope: "per_application", description: "Proof of residence for required duration" },
-      { doc_type: "photo", scope: "per_application", description: "Passport-size photo" },
-    ],
-    cross_checks: [
-      { id: "name_consistency", severity: "blocker", description: "Name must match across identity and residence proof", check_type: "consistency" },
-      { id: "address_consistency", severity: "blocker", description: "Address must be consistent — duration of residence is the core requirement", check_type: "consistency" },
-      { id: "document_quality", severity: "warning", description: "OCR confidence above 0.75", check_type: "quality" },
-    ],
-  };
-}
-
-function makeWidowPensionRules(stateId: string) {
-  return {
-    id: `${stateId}-widow-pension`,
-    name: "Widow Pension",
-    prerequisites: ["Applicant must be a widow", "Income below state threshold", "Age 18-59 (placeholder — verify with state rules)"],
-    required_documents: [
-      { doc_type: "identity_proof", scope: "per_member", description: "Aadhaar or equivalent identity proof" },
-      { doc_type: "address_proof", scope: "per_application", description: "Address proof" },
-      { doc_type: "death_certificate", scope: "per_application", description: "Death certificate of spouse" },
-      { doc_type: "income_proof_nonsalaried", scope: "per_application", description: "Income declaration or bank statement" },
-      { doc_type: "bank_account_proof", scope: "per_application", description: "Bank passbook or cancelled cheque for pension disbursement" },
-      { doc_type: "age_proof", scope: "per_application", description: "Age proof (Aadhaar DOB, birth certificate, or school leaving certificate)" },
-    ],
-    cross_checks: [
-      { id: "name_consistency", severity: "blocker", description: "Applicant name must match across identity + death certificate as spouse", check_type: "consistency" },
-      { id: "age_eligibility", severity: "blocker", description: "Flag if age falls outside 18-59 band (placeholder — real threshold varies by state)", check_type: "eligibility" },
-      { id: "income_ceiling", severity: "warning", description: "Flag if income suggests above threshold (placeholder — verify real limit)", check_type: "eligibility" },
-      { id: "bank_account_proof_present", severity: "blocker", description: "Pension cannot disburse without bank account proof", check_type: "completeness" },
-      { id: "document_quality", severity: "warning", description: "OCR confidence above 0.75", check_type: "quality" },
-    ],
-  };
-}
-
-function makeOldAgePensionRules(stateId: string) {
-  return {
-    id: `${stateId}-old-age-pension`,
-    name: "Old Age Pension",
-    prerequisites: ["Applicant must be 60+ years", "Income below state threshold"],
-    required_documents: [
-      { doc_type: "identity_proof", scope: "per_member", description: "Aadhaar or equivalent identity proof" },
-      { doc_type: "address_proof", scope: "per_application", description: "Address proof" },
-      { doc_type: "age_proof", scope: "per_application", description: "Age proof (Aadhaar DOB, birth certificate)" },
-      { doc_type: "income_proof_nonsalaried", scope: "per_application", description: "Income declaration or bank statement" },
-      { doc_type: "bank_account_proof", scope: "per_application", description: "Bank passbook or cancelled cheque" },
-    ],
-    cross_checks: [
-      { id: "age_eligibility", severity: "blocker", description: "Applicant must be 60+ (placeholder — verify real threshold)", check_type: "eligibility" },
-      { id: "income_ceiling", severity: "warning", description: "Flag if income suggests above threshold (placeholder)", check_type: "eligibility" },
-      { id: "bank_account_proof_present", severity: "blocker", description: "Pension cannot disburse without bank account proof", check_type: "completeness" },
-      { id: "document_quality", severity: "warning", description: "OCR confidence above 0.75", check_type: "quality" },
-    ],
-  };
-}
-
-const SEED_PACKS: Array<{ serviceId: string; rules: unknown; verificationLevel: "verified" | "simplified"; sourceMetadata: unknown }> = [
-  { serviceId: "rj-family-income", rules: makeRjIncomeRules(), verificationLevel: "verified", sourceMetadata: { researched: true, note: "Verified against eMitra portal documentation and common rejection patterns" } },
-  { serviceId: "rj-caste", rules: makeCasteRules("rj"), verificationLevel: "simplified", sourceMetadata: { researched: false, note: "Placeholder — simplified shape for demo. Verify against Rajasthan caste certificate rules before production." } },
-  { serviceId: "rj-domicile", rules: makeDomicileRules("rj"), verificationLevel: "simplified", sourceMetadata: { researched: false, note: "Placeholder — simplified shape for demo." } },
-  { serviceId: "rj-widow-pension", rules: makeWidowPensionRules("rj"), verificationLevel: "simplified", sourceMetadata: { researched: false, note: "Placeholder. Age/income bands are explicitly unverified placeholders." } },
-  { serviceId: "rj-old-age-pension", rules: makeOldAgePensionRules("rj"), verificationLevel: "simplified", sourceMetadata: { researched: false, note: "Placeholder. Age/income thresholds are unverified." } },
-  { serviceId: "up-income", rules: makeGenericIncomeRules("up", "Uttar Pradesh Income Certificate"), verificationLevel: "simplified", sourceMetadata: { researched: false, note: "Placeholder — simplified shape for demo." } },
-  { serviceId: "up-caste", rules: makeCasteRules("up"), verificationLevel: "simplified", sourceMetadata: { researched: false, note: "Placeholder — simplified shape for demo." } },
-  { serviceId: "up-domicile", rules: makeDomicileRules("up"), verificationLevel: "simplified", sourceMetadata: { researched: false, note: "Placeholder — simplified shape for demo." } },
-  { serviceId: "ka-income", rules: makeGenericIncomeRules("ka", "Karnataka Income Certificate"), verificationLevel: "simplified", sourceMetadata: { researched: false, note: "Placeholder — simplified shape for demo." } },
-  { serviceId: "ka-caste", rules: makeCasteRules("ka"), verificationLevel: "simplified", sourceMetadata: { researched: false, note: "Placeholder — simplified shape for demo." } },
-  { serviceId: "ka-residence", rules: makeDomicileRules("ka"), verificationLevel: "simplified", sourceMetadata: { researched: false, note: "Placeholder — simplified shape for demo." } },
-];
 
 const SEED_OPERATORS = [
   { phone: "9999900001", fullName: "Amit Verma", role: "operator" as const },
@@ -188,30 +127,65 @@ export async function seedDatabase() {
     await db.insert(states).values(s).onConflictDoNothing({ target: states.id });
   }
 
-  console.log("Seeding services...");
-  for (const s of SEED_SERVICES) {
-    await db.insert(services).values(s).onConflictDoNothing({ target: services.id });
-  }
+  console.log("Seeding services and rule packs...");
+  let serviceCount = 0;
+  let packCount = 0;
 
-  console.log("Seeding rule packs...");
-  for (const pack of SEED_PACKS) {
-    const existing = await db
-      .select()
-      .from(rulePacks)
-      .where(eq(rulePacks.serviceId, pack.serviceId))
-      .limit(1);
+  for (const state of SEED_STATES) {
+    for (const svc of SERVICE_CATALOG) {
+      const serviceId = `${state.code.toLowerCase()}-${svc.slug}`;
+      const serviceName = `${svc.name}`;
 
-    if (existing.length === 0) {
+      // Check if this is a verified service (Rajasthan Family Income)
+      const verifiedPack = VERIFIED_SERVICES[state.id]?.[svc.slug];
+
+      const serviceStatus = verifiedPack ? "live" : "beta";
+
+      await db
+        .insert(services)
+        .values({
+          id: serviceId,
+          stateId: state.id,
+          name: serviceName,
+          slug: svc.slug,
+          category: svc.category,
+          description: svc.description,
+          status: serviceStatus,
+        })
+        .onConflictDoNothing({ target: services.id });
+      serviceCount++;
+
+      // Skip rule pack generation for verified services — they already have one
+      if (verifiedPack) continue;
+
+      // Check if rule pack already exists
+      const existing = await db
+        .select()
+        .from(rulePacks)
+        .where(eq(rulePacks.serviceId, serviceId))
+        .limit(1);
+
+      if (existing.length > 0) continue;
+
+      const rules = generateRules(state.name, svc);
+
       await db.insert(rulePacks).values({
-        serviceId: pack.serviceId,
-        rules: pack.rules,
-        verificationLevel: pack.verificationLevel,
-        sourceMetadata: pack.sourceMetadata,
+        serviceId,
+        rules,
+        verificationLevel: "simplified",
+        sourceMetadata: {
+          generated: true,
+          template: svc.template,
+          note: "Auto-generated from a generic category template — not verified against this state's actual process. Placeholder thresholds where applicable.",
+        },
         status: "published",
         publishedAt: new Date(),
       });
+      packCount++;
     }
   }
+
+  console.log(`Seeded ${serviceCount} services, ${packCount} rule packs.`);
 
   console.log("Seeding operators...");
   for (const op of SEED_OPERATORS) {

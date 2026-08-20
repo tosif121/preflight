@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Trash2, PlusCircle, ArrowRight, Lock, MapPin } from "lucide-react";
+import { Trash2, PlusCircle, ArrowRight, Lock, MapPin, Sparkles, CheckCircle2 } from "lucide-react";
 
 interface StateItem {
   id: string;

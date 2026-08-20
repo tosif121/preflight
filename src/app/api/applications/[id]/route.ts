@@ -8,6 +8,7 @@ import { resolutionsRepository } from "@/lib/repositories/resolutions.repository
 import { auditRepository } from "@/lib/repositories/audit.repository";
 import { statesRepository } from "@/lib/repositories/states.repository";
 import { servicesRepository } from "@/lib/repositories/services.repository";
+import { operatorsRepository } from "@/lib/repositories/operators.repository";
 
 export async function GET(
   _request: NextRequest,
@@ -22,9 +23,10 @@ export async function GET(
     return Response.json({ error: "Application not found" }, { status: 404 });
   }
 
-  const [state, service] = await Promise.all([
+  const [state, service, operator] = await Promise.all([
     statesRepository.findById(application.stateId),
     servicesRepository.findById(application.serviceId),
+    operatorsRepository.findById(application.operatorId),
   ]);
 
   const members = await familyMembersRepository.listByApplication(id);
@@ -38,6 +40,7 @@ export async function GET(
       ...application,
       stateName: state?.name ?? application.stateId,
       serviceName: service?.name ?? application.serviceId,
+      operatorName: operator?.fullName ?? operator?.phone ?? "Unknown",
     },
     members,
     documents: docs,

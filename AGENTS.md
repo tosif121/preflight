@@ -12,24 +12,24 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## What This Is
 
-Preflight is an application-quality preflight tool for the Rajasthan Family
-Income Certificate (issued via eMitra). It catches completeness/consistency
-problems BEFORE submission, explains them in plain language, and produces a
-clean "ready" packet. It never claims official verification — final authority
-always stays with the department (Tehsildar).
+Preflight is a pre-submission quality checker for government applications
+across all 36 Indian states and union territories. It catches
+completeness/consistency problems BEFORE submission, explains them in
+plain language, and produces a clean "ready" packet. It never claims
+official verification — final authority always stays with the department.
 
 ## Architecture Flow
 
 ```
-Synthetic Documents (SVGs in /public/mock-docs/)
+Synthetic Documents (SVGs)
         ↓
 OpenAI Vision OCR  ← REAL (falls back to deterministic mocks if no OPENAI_API_KEY)
         ↓
 Normalizer         ← REAL (formatting-only, never resolves factual disagreements)
         ↓
-Rajasthan Rule Pack (JSON in /lib/rules/rajasthan/family-income.json)
+Rule Pack (JSON — verified for Rajasthan, auto-generated for all other states)
         ↓
-Preflight Evaluation (pure function in /lib/rules/engine.ts)
+Preflight Evaluation (pure function — 9 check implementations)
         ↓
 Fix Plan (AI resolution in /lib/ai/resolution.ts, falls back to canned mock responses)
         ↓
@@ -41,12 +41,14 @@ Reviewer Gateway (/reviewer-gateway/[id]) ← REAL prototype, read-only evidence
 ## Tech Stack
 
 - **Framework**: Next.js 16, App Router, React 19, TypeScript (strict mode)
-- **Styling**: Tailwind CSS v4 + shadcn/ui (neutral base color)
+- **Styling**: Tailwind CSS v4 + shadcn/ui (terracotta palette, `@base-ui` not Radix)
 - **Icons**: lucide-react exclusively — no other icon sets
-- **Database**: Neon (serverless Postgres)
-- **ORM**: Drizzle ORM with `@neondatabase/serverless` driver
+- **Database**: Neon (serverless Postgres) via `@neondatabase/serverless`
+- **ORM**: Drizzle ORM with `drizzle-orm/neon-http` driver
 - **Validation**: zod at every API input/output boundary
 - **AI**: OpenAI SDK (vision model for OCR, text model for resolution)
+- **Storage**: S3-compatible (Neon Storage or AWS S3) for uploaded documents
+- **Auth**: Simplified phone + OTP flow (any 6-digit OTP accepted for demo)
 - **Toasts**: react-hot-toast
 
 ## Data Access Pattern
@@ -63,36 +65,49 @@ src/lib/repositories/
   checks.repository.ts
   resolutions.repository.ts
   audit.repository.ts
+  operators.repository.ts
+  sessions.repository.ts
+  rule-packs.repository.ts
+  services.repository.ts
+  states.repository.ts
+  otp.repository.ts
 ```
 
 ## Environment Variables
 
 ```
-DATABASE_URL    — Neon Postgres connection string (required for data)
-OPENAI_API_KEY  — OpenAI API key (optional; unset = deterministic mock OCR/resolution)
+DATABASE_URL       — Neon Postgres connection string (required)
+OPENAI_API_KEY     — OpenAI API key (optional; unset = mock OCR/resolution)
+S3_BUCKET          — S3 bucket name (optional; unset = no document storage)
+S3_ENDPOINT        — S3 endpoint URL (optional; e.g., Neon Storage)
+S3_ACCESS_KEY_ID   — S3 access key (optional)
+S3_SECRET_ACCESS_KEY — S3 secret key (optional)
+S3_REGION          — S3 region (optional; default: us-east-2)
 ```
 
 ## Mock vs Real Boundary
 
 | Component          | Real / Mock |
 |--------------------|-------------|
-| Database (Neon)    | REAL        |
+| Database (Neon)    | REAL |
 | OCR extraction     | REAL when `OPENAI_API_KEY` is set; deterministic mock fallback otherwise |
 | Normalizer         | REAL (pure formatting logic) |
 | Rule engine        | REAL (pure evaluation against JSON rule pack) |
 | Resolution AI      | REAL when key set; canned mock responses otherwise |
+| Document storage   | REAL S3-compatible storage (when configured) |
 | Government submit  | MOCK (labeled in UI) |
 | Payment (₹40 fee)  | MOCK (labeled in UI) |
-| OTP / SMS          | NOT IMPLEMENTED (out of scope) |
-| Documents          | SYNTHETIC (SVGs with fake data, "SAMPLE — SYNTHETIC DOCUMENT" watermark) |
+| Auth (OTP/SMS)     | SIMPLIFIED (any 6-digit OTP accepted for demo) |
+| Documents          | SYNTHETIC (SVGs with fake data, "SAMPLE" watermark) |
 
 ## Commands
 
 ```bash
-npm run dev          # Start dev server
-npx drizzle-kit push # Push schema to Neon
-npx drizzle-kit generate  # Generate migrations
-npm run build        # Production build
+npm run dev                    # Start dev server
+npm run build                  # Production build
+npx drizzle-kit push           # Push schema to Neon
+npx drizzle-kit generate       # Generate migrations
+curl http://localhost:3000/api/seed  # Seed database (36 states, 360 services)
 ```
 
 ## Key Conventions
@@ -104,3 +119,5 @@ npm run build        # Production build
 - Never generate declarations/affidavits — only fix instructions
 - Never claim "verified" — only "preflight checks completed"
 - All UI copy pairs "ready" states with the department-verification disclaimer
+- Use `max-w-[1400px]` for consistent page widths
+- shadcn/ui uses `@base-ui` (not Radix) — Dialog `render` prop, Select `onValueChange` passes `string | null`

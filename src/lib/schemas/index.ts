@@ -1,18 +1,5 @@
 import { z } from "zod";
 
-export const requestOtpSchema = z.object({
-  phone: z
-    .string()
-    .min(10, "Phone must be at least 10 digits")
-    .max(15, "Phone must be at most 15 digits")
-    .regex(/^\d+$/, "Phone must contain only digits"),
-});
-
-export const verifyOtpSchema = z.object({
-  phone: z.string().min(10).max(15).regex(/^\d+$/),
-  code: z.string().length(6, "OTP must be 6 digits").regex(/^\d+$/),
-});
-
 export const createApplicationSchema = z.object({
   stateId: z.string().min(1, "State is required"),
   serviceId: z.string().min(1, "Service is required"),
