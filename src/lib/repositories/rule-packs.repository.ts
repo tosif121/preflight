@@ -64,10 +64,9 @@ export const rulePacksRepository = {
         .where(eq(rulePacks.id, id))
         .returning();
 
-      const derivedStatus = pack.verificationLevel === "verified" ? "live" : "beta";
       await tx
         .update(services)
-        .set({ status: derivedStatus })
+        .set({ status: "live" })
         .where(eq(services.id, pack.serviceId));
 
       return updated;

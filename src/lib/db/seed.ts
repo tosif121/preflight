@@ -67,11 +67,18 @@ const SERVICE_CATALOG: ServiceDef[] = [
   { slug: "domicile", name: "Domicile Certificate", category: "certificate", description: "Proof of residence for state schemes", template: "certificate" },
   { slug: "birth", name: "Birth Certificate", category: "certificate", description: "Official birth registration and certificate", template: "vital_event" },
   { slug: "death", name: "Death Certificate", category: "certificate", description: "Official death registration and certificate", template: "vital_event" },
+  { slug: "marriage", name: "Marriage Certificate", category: "certificate", description: "Official marriage registration and certificate", template: "certificate" },
+  { slug: "ews", name: "EWS Certificate", category: "certificate", description: "Economically Weaker Section certificate for reservation", template: "certificate" },
+  { slug: "non-creamy-layer", name: "Non-Creamy Layer Certificate", category: "certificate", description: "OBC non-creamy layer verification for central reservations", template: "certificate" },
+  { slug: "agriculturist", name: "Agriculturist Certificate", category: "certificate", description: "Certificate for agricultural income and landholding status", template: "certificate" },
+  { slug: "disability", name: "Disability Certificate", category: "certificate", description: "Certificate for persons with disabilities (PwD)", template: "certificate" },
   { slug: "widow-pension", name: "Widow Pension", category: "pension", description: "Monthly pension eligibility for widows under state welfare", template: "pension", extraDocType: "death_certificate" },
   { slug: "old-age-pension", name: "Old Age Pension", category: "pension", description: "Monthly pension for senior citizens below income threshold", template: "pension" },
   { slug: "disability-pension", name: "Disability Pension", category: "pension", description: "Monthly pension for persons with disabilities", template: "pension" },
   { slug: "ration-card", name: "Ration Card", category: "welfare", description: "Public distribution system ration card registration", template: "welfare" },
   { slug: "scholarship", name: "Scholarship Application", category: "welfare", description: "State scholarship application for eligible students", template: "welfare" },
+  { slug: "driving-license", name: "Driving License", category: "certificate", description: "Driving license application and renewal", template: "certificate" },
+  { slug: "trade-license", name: "Trade License", category: "certificate", description: "Municipal trade license for business operations", template: "certificate" },
 ];
 
 // Rajasthan Family Income Certificate is the ONLY verified, hand-researched pack
@@ -139,8 +146,6 @@ export async function seedDatabase() {
       // Check if this is a verified service (Rajasthan Family Income)
       const verifiedPack = VERIFIED_SERVICES[state.id]?.[svc.slug];
 
-      const serviceStatus = verifiedPack ? "live" : "beta";
-
       await db
         .insert(services)
         .values({
@@ -150,7 +155,7 @@ export async function seedDatabase() {
           slug: svc.slug,
           category: svc.category,
           description: svc.description,
-          status: serviceStatus,
+          status: "live",
         })
         .onConflictDoNothing({ target: services.id });
       serviceCount++;

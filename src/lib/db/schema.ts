@@ -43,10 +43,10 @@ export const services = pgTable("services", {
   }).notNull(),
   description: text("description").notNull(),
   status: text("status", {
-    enum: ["live", "beta", "coming_soon"],
+    enum: ["live"],
   })
     .notNull()
-    .default("coming_soon"),
+    .default("live"),
 });
 
 export const servicesRelations = relations(services, ({ one, many }) => ({

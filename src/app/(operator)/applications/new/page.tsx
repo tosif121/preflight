@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Trash2, PlusCircle, ArrowRight, Lock, MapPin, Sparkles, CheckCircle2 } from "lucide-react";
+import { Trash2, PlusCircle, ArrowRight, MapPin, Sparkles, CheckCircle2 } from "lucide-react";
 
 interface StateItem {
   id: string;
@@ -40,12 +40,6 @@ interface MemberDraft {
 }
 
 const RELATIONS = ["self", "spouse", "father", "mother", "son", "daughter", "other"];
-
-const STATUS_BADGE: Record<string, { label: string; color: string }> = {
-  live: { label: "Live", color: "bg-[#4A7A59]/10 text-[#4A7A59]" },
-  beta: { label: "Beta", color: "bg-[#F59E0B]/10 text-[#F59E0B]" },
-  coming_soon: { label: "Coming Soon", color: "bg-muted text-muted-foreground" },
-};
 
 export default function NewApplicationPage() {
   const router = useRouter();
@@ -171,38 +165,25 @@ export default function NewApplicationPage() {
             <CardTitle className="text-base">Select Service</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {services.map((svc) => {
-              const badge = STATUS_BADGE[svc.status] ?? STATUS_BADGE.coming_soon;
-              const enabled = svc.status !== "coming_soon";
-              return (
+            {services.map((svc) => (
                 <div
                   key={svc.id}
-                  onClick={() => enabled && setSelectedService(svc.id)}
+                  onClick={() => setSelectedService(svc.id)}
                   className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all ${
                     selectedService === svc.id
                       ? "border-primary bg-primary/5"
-                      : enabled
-                      ? "border-border hover:border-primary/30"
-                      : "border-dashed opacity-50 cursor-not-allowed"
+                      : "border-border hover:border-primary/30"
                   }`}
                 >
                   <div>
                     <div className="flex items-center gap-2">
-                      {enabled ? (
-                        <div className="w-3 h-3 rounded-full bg-primary" />
-                      ) : (
-                        <Lock className="h-3 w-3 text-muted-foreground" />
-                      )}
+                      <div className="w-3 h-3 rounded-full bg-primary" />
                       <span className="text-sm font-medium">{svc.name}</span>
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${badge.color}`}>
-                        {badge.label}
-                      </span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1 ml-5">{svc.description}</p>
                   </div>
                 </div>
-              );
-            })}
+              ))}
           </CardContent>
         </Card>
       )}
