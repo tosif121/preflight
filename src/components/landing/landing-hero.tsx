@@ -54,7 +54,7 @@ export default function LandingHero() {
             Fix issues now, not after rejection.
           </p>
 
-          <div className="flex flex-col gap-2.5 mb-8">
+          <div className="flex flex-col gap-4 mb-8">
             {POINTS.map((p, i) => (
               <div
                 key={i}
