@@ -57,7 +57,11 @@ export default function NewApplicationPage() {
   useEffect(() => {
     fetch("/api/states")
       .then((r) => r.json())
-      .then((data) => setStates(Array.isArray(data) ? data : []))
+      .then((data) => {
+        const list = Array.isArray(data) ? data : [];
+        list.sort((a: StateItem, b: StateItem) => a.name.localeCompare(b.name));
+        setStates(list);
+      })
       .catch(() => {});
   }, []);
 
