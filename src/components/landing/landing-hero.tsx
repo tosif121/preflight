@@ -107,7 +107,7 @@ export default function LandingHero() {
 
         <div className="order-1 lg:order-2 flex items-center justify-center lg:justify-end">
           <div className="relative w-full max-w-[500px] lg:max-w-none">
-            <div className="rounded-3xl overflow-hidden shadow-[0_12px_40px_rgba(200,90,64,0.08)]">
+            <div>
               <Image
                 src="/images/hero.png"
                 alt="Preflight — document verification dashboard"
@@ -117,8 +117,6 @@ export default function LandingHero() {
                 priority
               />
             </div>
-            <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-[#C85A40]/10 rounded-full blur-2xl" />
-            <div className="absolute -top-4 -left-4 w-16 h-16 bg-[#C85A40]/5 rounded-full blur-xl" />
           </div>
         </div>
       </div>
