@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ShieldCheck, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ShieldCheck, X, LayoutDashboard, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SignInModal } from "@/components/sign-in-modal";
 
@@ -13,15 +14,29 @@ const NAV_LINKS = [
 ];
 
 export default function LandingNavbar() {
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((r) => { if (r.ok) setLoggedIn(true); })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const updateScrolled = () => setScrolled(window.scrollY > 12);
     window.addEventListener("scroll", updateScrolled, { passive: true });
     return () => window.removeEventListener("scroll", updateScrolled);
   }, []);
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    setLoggedIn(false);
+    router.push("/");
+  };
 
   const openModal = () => { setOpen(false); setModalOpen(true); };
 
@@ -61,23 +76,68 @@ export default function LandingNavbar() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
-            <Button
-              size="sm"
-              onClick={() => setModalOpen(true)}
-              className="bg-[#C85A40] hover:bg-[#A84C36] text-white"
-            >
-              Sign In
-            </Button>
+            {loggedIn ? (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => router.push("/dashboard")}
+                  className="gap-1.5"
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  Dashboard
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={handleLogout}
+                  className="gap-1.5"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Button
+                size="sm"
+                onClick={() => setModalOpen(true)}
+                className="bg-[#C85A40] hover:bg-[#A84C36] text-white"
+              >
+                Sign In
+              </Button>
+            )}
           </div>
 
           <div className="md:hidden flex items-center gap-2">
-            <Button
-              size="sm"
-              onClick={() => setModalOpen(true)}
-              className="text-xs px-3 bg-[#C85A40] hover:bg-[#A84C36] text-white"
-            >
-              Sign In
-            </Button>
+            {loggedIn ? (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => router.push("/dashboard")}
+                  className="text-xs px-3 gap-1"
+                >
+                  <LayoutDashboard className="h-3.5 w-3.5" />
+                  Dashboard
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={handleLogout}
+                  className="text-xs px-3 gap-1"
+                >
+                  <LogOut className="h-3.5 w-3.5" />
+                </Button>
+              </>
+            ) : (
+              <Button
+                size="sm"
+                onClick={() => setModalOpen(true)}
+                className="text-xs px-3 bg-[#C85A40] hover:bg-[#A84C36] text-white"
+              >
+                Sign In
+              </Button>
+            )}
             <button
               className="w-10 h-10 flex items-center justify-center rounded-full bg-black/5 transition-all active:scale-95 hover:bg-black/10"
               onClick={() => setOpen(!open)}
@@ -151,12 +211,32 @@ export default function LandingNavbar() {
             </nav>
 
             <div className="px-4 py-4 border-t border-[#EAE5DC]">
-              <Button
-                onClick={openModal}
-                className="w-full bg-[#C85A40] hover:bg-[#A84C36] text-white"
-              >
-                Sign In
-              </Button>
+              {loggedIn ? (
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => { setOpen(false); router.push("/dashboard"); }}
+                    className="flex-1 gap-1.5"
+                  >
+                    <LayoutDashboard className="h-4 w-4" />
+                    Dashboard
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => { setOpen(false); handleLogout(); }}
+                    className="gap-1.5"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  onClick={openModal}
+                  className="w-full bg-[#C85A40] hover:bg-[#A84C36] text-white"
+                >
+                  Sign In
+                </Button>
+              )}
             </div>
           </div>
         </>
