@@ -107,7 +107,7 @@ export default function LandingHero() {
 
         <div className="order-1 lg:order-2 flex items-center justify-center lg:justify-end">
           <div className="relative w-full max-w-[500px] lg:max-w-none">
-            <div className="rounded-3xl overflow-hidden border border-[#EAE5DC] shadow-[0_12px_40px_rgba(200,90,64,0.08)]">
+            <div className="rounded-3xl overflow-hidden shadow-[0_12px_40px_rgba(200,90,64,0.08)]">
               <Image
                 src="/images/hero.png"
                 alt="Preflight — document verification dashboard"
