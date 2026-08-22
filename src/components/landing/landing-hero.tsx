@@ -3,24 +3,12 @@
 import { useState } from "react";
 import {
   ArrowRight,
-  Check,
-  AlertTriangle,
-  FileText,
   Sparkles,
-  RefreshCw,
   Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SignInModal } from "@/components/sign-in-modal";
-
-const FLOW_STEPS = [
-  { icon: FileText, label: "Documents" },
-  { icon: Sparkles, label: "AI reads" },
-  { icon: AlertTriangle, label: "Problem found" },
-  { icon: ArrowRight, label: "Fix" },
-  { icon: RefreshCw, label: "Re-check" },
-  { icon: Check, label: "Ready" },
-];
+import Image from "next/image";
 
 export default function LandingHero() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -100,55 +88,20 @@ export default function LandingHero() {
         </div>
 
         <div className="order-1 lg:order-2 flex items-center justify-center lg:justify-end">
-          <div className="w-full max-w-[500px]">
-            <div className="rounded-2xl border border-[#EAE5DC] bg-white p-6 shadow-sm">
-              <div className="text-xs font-semibold text-[#7A7771] uppercase tracking-wider mb-4">
+          <div className="relative w-full max-w-[500px] lg:max-w-none">
+            <div className="rounded-2xl border border-[#EAE5DC] bg-white p-4 shadow-sm">
+              <div className="text-xs font-semibold text-[#7A7771] uppercase tracking-wider mb-3 text-center">
                 How Preflight works
               </div>
-              <div className="flex flex-col gap-3">
-                {FLOW_STEPS.map((step, i) => {
-                  const Icon = step.icon;
-                  const isProblem = step.label === "Problem found";
-                  const isReady = step.label === "Ready";
-                  return (
-                    <div key={i}>
-                      <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg ${
-                        isReady
-                          ? "bg-[#F0F7F3] border border-[#4A7A59]/20"
-                          : isProblem
-                          ? "bg-[#FEF7E8] border border-[#F59E0B]/20"
-                          : "bg-[#FCF8F4] border border-[#EAE5DC]"
-                      }`}>
-                        <Icon size={16} className={
-                          isReady
-                            ? "text-[#4A7A59]"
-                            : isProblem
-                            ? "text-[#F59E0B]"
-                            : "text-[#C85A40]"
-                        } />
-                        <span className={`text-sm font-medium ${
-                          isReady
-                            ? "text-[#4A7A59]"
-                            : isProblem
-                            ? "text-[#92600A]"
-                            : "text-[#1C1B1A]"
-                        }`}>
-                          {step.label}
-                        </span>
-                        {isReady && (
-                          <Check size={14} className="text-[#4A7A59] ml-auto" />
-                        )}
-                      </div>
-                      {i < FLOW_STEPS.length - 1 && (
-                        <div className="flex justify-center py-0.5">
-                          <div className="w-px h-2 bg-[#EAE5DC]" />
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="mt-4 pt-3 border-t border-[#EAE5DC] text-[11px] text-[#B0ACA8] text-center">
+              <Image
+                src="/images/hero.png"
+                alt="Preflight — pre-submission copilot for UMANG"
+                width={600}
+                height={450}
+                className="w-full h-auto rounded-xl"
+                priority
+              />
+              <div className="mt-3 pt-3 border-t border-[#EAE5DC] text-[11px] text-[#B0ACA8] text-center">
                 Verified before you submit to UMANG
               </div>
             </div>
