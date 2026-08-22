@@ -173,14 +173,14 @@ export default function PacketPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="grid grid-cols-2 gap-3 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
             <div>
               <p className="text-muted-foreground">Citizen</p>
               <p className="font-medium">{app?.citizenName}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Operator</p>
-              <p className="font-medium">{app?.operatorName}</p>
+              <p className="text-muted-foreground">Platform</p>
+              <p className="font-medium">UMANG</p>
             </div>
             <div>
               <p className="text-muted-foreground">Service</p>
@@ -249,7 +249,7 @@ export default function PacketPage() {
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between text-sm">
-            <span>eMitra Service Fee</span>
+            <span>UMANG Service Fee</span>
             <span className="font-medium">₹40 (mock — no real payment processed)</span>
           </div>
         </CardContent>

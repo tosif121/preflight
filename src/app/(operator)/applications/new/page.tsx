@@ -72,8 +72,8 @@ const DRAFT_KEY = "preflight_wizard_draft";
 const RELATIONS = ["self", "spouse", "father", "mother", "son", "daughter", "brother", "sister", "other"];
 
 const STEPS = [
+  { id: "intent", label: "Intent", icon: Search },
   { id: "state", label: "State", icon: MapPin },
-  { id: "service", label: "Service", icon: FileText },
   { id: "details", label: "Details", icon: User },
   { id: "family", label: "Family", icon: Users },
   { id: "review", label: "Review", icon: ClipboardCheck },
@@ -308,13 +308,11 @@ export default function NewApplicationPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           stateId: "rajasthan",
-          serviceId: "rj-income",
-          citizenName: "Ramesh Kumar Sharma",
+          serviceId: "rj-widow-pension",
+          citizenName: "Sunita Devi",
           intendedUseDeadline: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
           familyMembers: [
-            { fullName: "Ramesh Kumar Sharma", relation: "self", isEarning: true },
-            { fullName: "Sunita Sharma", relation: "spouse", isEarning: true },
-            { fullName: "Amit Sharma", relation: "son", isEarning: false },
+            { fullName: "Sunita Devi", relation: "self", isEarning: false },
           ],
         }),
       });
@@ -382,11 +380,11 @@ export default function NewApplicationPage() {
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
           <div>
-            {/* ─── Step 1: State ────────────────────────────────────────── */}
+            {/* ─── Step 1: Intent ────────────────────────────────────────── */}
             {step === 0 && (
               <div>
-                <h2 className="text-xl font-bold text-[#1C1B1A] mb-1">Where are you applying?</h2>
-                <p className="text-sm text-[#7A7771] mb-5">Select the state or union territory</p>
+                <h2 className="text-xl font-bold text-[#1C1B1A] mb-1">What are you trying to do?</h2>
+                <p className="text-sm text-[#7A7771] mb-5">Tell us what you need help with</p>
 
                 <div className="relative mb-5">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#7A7771]" />
@@ -579,7 +577,7 @@ export default function NewApplicationPage() {
                       <Lightbulb className="h-4 w-4 text-[#C85A40] shrink-0 mt-0.5" />
                       <div className="flex-1">
                         <p className="text-sm font-medium text-[#1C1B1A] mb-3">Do you have a submission deadline?</p>
-                        <div className="flex gap-4 mb-3">
+                        <div className="flex flex-col sm:flex-row gap-3 mb-3">
                           <label className="flex items-center gap-2 text-sm cursor-pointer">
                             <input
                               type="radio"

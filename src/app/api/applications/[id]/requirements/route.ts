@@ -134,6 +134,15 @@ const SERVICE_DOC_REQUIREMENTS: Record<string, (members: { id: string; fullName:
       reason: "Required to verify income eligibility for pension",
     },
     {
+      id: "death-certificate",
+      docType: "death_certificate",
+      label: "Death Certificate",
+      description: "Death certificate of the deceased spouse",
+      scope: "application",
+      required: true,
+      reason: "Required to verify widow status for pension eligibility",
+    },
+    {
       id: "bank-proof",
       docType: "bank_account_proof",
       label: "Bank Account Proof",

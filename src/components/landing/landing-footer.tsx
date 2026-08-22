@@ -38,11 +38,12 @@ export default function LandingFooter() {
               </div>
             </Link>
             <p className="text-sm text-[#54504B] leading-relaxed max-w-[260px] mb-4">
-              Application-quality preflight tool for Rajasthan eMitra services.
-              Catch errors before submission.
+              Pre-submission copilot for UMANG. Catch document errors and
+              inconsistencies before you submit.
             </p>
             <p className="text-xs text-[#B0ACA8]">
-              Prototype — not a government system.
+              Independent hackathon prototype — not affiliated with any
+              government body.
             </p>
           </div>
 
@@ -90,7 +91,7 @@ export default function LandingFooter() {
             <p className="text-sm text-[#54504B] leading-relaxed">
               Preflight is an advisory pre-submission checker. It does not
               perform official government verification. Final authority stays
-              with the department (Tehsildar).
+              with the respective department.
             </p>
           </div>
         </div>
@@ -108,7 +109,7 @@ export default function LandingFooter() {
               className="text-red-500"
               fill="currentColor"
             />{" "}
-            for Rajasthan eMitra
+            for Indian citizens
           </div>
 
           <div className="flex items-center gap-2">

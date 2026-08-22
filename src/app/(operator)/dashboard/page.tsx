@@ -186,7 +186,7 @@ export default function DashboardPage() {
                             : nextAction.nextStep}
                         </p>
                         <p className="text-xs text-[#7A7771]">
-                          {nextAction.serviceName} &middot; {nextAction.stateName}
+                          {nextAction.serviceName} &middot; UMANG
                           {nextAction.blockers > 0 && (
                             <span className="ml-2">
                               &middot; {nextAction.checksPassed}/{nextAction.checksTotal} checks passed
@@ -208,7 +208,7 @@ export default function DashboardPage() {
           )}
 
           {/* ─── Stats ──────────────────────────────────────────────── */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
             <Card className="border-[#EAE5DC]">
               <CardContent className="py-4 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
@@ -267,7 +267,7 @@ export default function DashboardPage() {
                             </div>
                           </div>
                           <p className="text-xs text-[#7A7771]">
-                            {app.stateName} &middot; {app.portalName}
+                            UMANG &middot; {app.portalName}
                           </p>
                         </div>
                         <ArrowRight className="h-4 w-4 text-[#7A7771] group-hover:text-[#C85A40] transition-colors shrink-0 mt-1" />

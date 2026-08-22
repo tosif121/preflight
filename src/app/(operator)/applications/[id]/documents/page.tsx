@@ -295,7 +295,7 @@ export default function DocumentsPage() {
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <Badge variant="secondary" className="gap-1.5">
           <MapPin className="h-3 w-3" />
-          {app?.stateName}
+          UMANG
         </Badge>
         <Badge variant="secondary" className="gap-1.5">
           <FileText className="h-3 w-3" />
@@ -535,7 +535,7 @@ export default function DocumentsPage() {
                 <p className="text-xs font-semibold text-[#7A7771] uppercase tracking-wider mb-3">What happens next</p>
                 <div className="space-y-3">
                   {[
-                    { num: 1, text: "We read your documents using OCR" },
+                    { num: 1, text: "We read your documents using AI (OpenAI Vision)" },
                     { num: 2, text: "Compare them with your application" },
                     { num: 3, text: "Find missing or inconsistent information" },
                     { num: 4, text: "Give you specific fixes" },
@@ -582,14 +582,14 @@ export default function DocumentsPage() {
       </div>
 
       {/* ─── Bottom CTA ──────────────────────────────────────────────── */}
-      <div className="flex justify-between items-center mt-8 pt-6 border-t border-[#EAE5DC]">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 pt-6 border-t border-[#EAE5DC]">
         <Link href="/dashboard">
           <Button variant="outline">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to dashboard
           </Button>
         </Link>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
           {uploadedCount < totalRequired && (
             <p className="text-xs text-[#7A7771]">
               {missingCount} document{missingCount !== 1 ? "s" : ""} missing - Preflight will flag them

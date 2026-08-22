@@ -72,8 +72,11 @@ export function SignInModal({ open: controlledOpen, onOpenChange }: SignInModalP
             <div className="w-8 h-8 rounded-lg bg-[#C85A40] flex items-center justify-center">
               <ShieldCheck className="h-4 w-4 text-white" />
             </div>
-            Sign in
+            Welcome to Preflight
           </DialogTitle>
+          <p className="text-sm text-[#7A7771] mt-1">
+            Prepare your government application before you submit.
+          </p>
         </DialogHeader>
 
         <div className="space-y-4 pt-2">
@@ -101,6 +104,9 @@ export function SignInModal({ open: controlledOpen, onOpenChange }: SignInModalP
                     maxLength={10}
                   />
                 </div>
+                <p className="text-[11px] text-[#B0ACA8] mt-1.5">
+                  Enter any 10-digit number for this demo.
+                </p>
               </div>
               <Button
                 onClick={handleSendOtp}
@@ -116,7 +122,7 @@ export function SignInModal({ open: controlledOpen, onOpenChange }: SignInModalP
           {step === "otp" && (
             <>
               <div>
-                <Label htmlFor="modal-otp">Enter OTP</Label>
+                <Label htmlFor="modal-otp">Enter verification code</Label>
                 <div className="relative">
                   <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#B0ACA8]" />
                   <Input
@@ -129,6 +135,9 @@ export function SignInModal({ open: controlledOpen, onOpenChange }: SignInModalP
                     maxLength={6}
                   />
                 </div>
+                <p className="text-[11px] text-[#B0ACA8] mt-1.5">
+                  Enter any 6-digit code (e.g., 123456).
+                </p>
               </div>
               <Button
                 onClick={handleVerify}
