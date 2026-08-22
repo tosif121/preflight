@@ -89,22 +89,14 @@ export default function LandingHero() {
 
         <div className="order-1 lg:order-2 flex items-center justify-center lg:justify-end">
           <div className="relative w-full max-w-[500px] lg:max-w-none">
-            <div className="rounded-2xl border border-[#EAE5DC] bg-white p-4 shadow-sm">
-              <div className="text-xs font-semibold text-[#7A7771] uppercase tracking-wider mb-3 text-center">
-                How Preflight works
-              </div>
-              <Image
-                src="/images/hero.png"
-                alt="Preflight — pre-submission copilot for UMANG"
-                width={600}
-                height={450}
-                className="w-full h-auto rounded-xl"
-                priority
-              />
-              <div className="mt-3 pt-3 border-t border-[#EAE5DC] text-[11px] text-[#B0ACA8] text-center">
-                Verified before you submit to UMANG
-              </div>
-            </div>
+            <Image
+              src="/images/hero.png"
+              alt="Preflight — pre-submission copilot for UMANG"
+              width={600}
+              height={450}
+              className="w-full h-auto rounded-xl"
+              priority
+            />
           </div>
         </div>
       </div>
