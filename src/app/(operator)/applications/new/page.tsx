@@ -317,13 +317,13 @@ export default function NewApplicationPage() {
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to create demo");
+      if (!res.ok) throw new Error("Failed to create application");
       const data = await res.json();
       clearDraft();
       toast.success("Demo created - redirecting to documents");
       router.push(`/applications/${data.application.id}/documents`);
     } catch {
-      toast.error("Failed to create demo");
+      toast.error("Failed to create application");
     } finally {
       setSubmitting(false);
     }
@@ -348,7 +348,7 @@ export default function NewApplicationPage() {
               </span>
               <Button variant="ghost" size="sm" onClick={loadDemo} disabled={submitting} className="text-xs gap-1.5">
                 <Zap className="h-3.5 w-3.5" />
-                Try 2-minute demo
+                Try 2-minute walkthrough
               </Button>
             </div>
           </div>

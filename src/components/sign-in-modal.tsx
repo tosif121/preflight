@@ -105,7 +105,7 @@ export function SignInModal({ open: controlledOpen, onOpenChange }: SignInModalP
                   />
                 </div>
                 <p className="text-[11px] text-[#B0ACA8] mt-1.5">
-                  Enter any 10-digit number for this demo.
+                  Enter any 10-digit number to continue.
                 </p>
               </div>
               <Button

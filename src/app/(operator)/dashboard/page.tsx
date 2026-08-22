@@ -144,7 +144,7 @@ export default function DashboardPage() {
               <Link href="/applications/new">
                 <Button variant="outline">
                   <Zap className="h-4 w-4 mr-2" />
-                  Try demo application
+                  Try sample application
                 </Button>
               </Link>
             </div>

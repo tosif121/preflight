@@ -158,7 +158,7 @@ export default function PacketPage() {
                 Submitted!
               </p>
               <p className="text-xs text-green-700 mt-1">
-                This is a demo. In real use, it would go to the department for review.
+                This is a prototype. In real use, it would go to the department for review.
               </p>
             </div>
           </CardContent>

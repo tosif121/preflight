@@ -23,7 +23,7 @@ const FAQS: FAQ[] = [
   },
   {
     q: "Do I need an OpenAI API key?",
-    a: "No. When OPENAI_API_KEY is not set, Preflight uses deterministic mock OCR responses so the full demo works without any API key. When a key is set, it uses a real vision model for extraction.",
+    a: "No. When OPENAI_API_KEY is not set, Preflight uses deterministic mock OCR responses so the full experience works without any API key. When a key is set, it uses a real vision model for extraction.",
   },
   {
     q: "Can I use this for other certificate types?",
@@ -31,7 +31,7 @@ const FAQS: FAQ[] = [
   },
   {
     q: "Is real personal data used?",
-    a: "No. All documents and data in the demo are synthetic — fake names, masked ID numbers, and SVG placeholder images. No real Aadhaar/PAN numbers or personal data are used anywhere.",
+    a: "No. All documents and data are synthetic — fake names, masked ID numbers, and SVG placeholder images. No real Aadhaar/PAN numbers or personal data are used anywhere.",
   },
 ];
 

@@ -99,7 +99,7 @@ export default function LandingFooter() {
         <div className="border-t border-[#E9DED7] pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[13px] text-[#5C5752]">
           <div className="flex items-center gap-1.5">
             <Copyright size={13} />
-            {currentYear} Preflight. Built for hackathon demo.
+            {currentYear} Preflight. Built for hackathon prototype.
           </div>
 
           <div className="flex items-center gap-1">

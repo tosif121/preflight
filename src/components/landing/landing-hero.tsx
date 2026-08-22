@@ -69,7 +69,7 @@ export default function LandingHero() {
               onClick={() => setModalOpen(true)}
               className="w-full sm:w-auto border-[#EAE5DC] text-[#1C1B1A] hover:bg-[#F5F2EB] py-3 px-6 text-base"
             >
-              Try 2-minute demo
+              Try 2-minute walkthrough
             </Button>
           </div>
 
