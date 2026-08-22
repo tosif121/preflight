@@ -1,10 +1,32 @@
 # Preflight
 
-**Pre-submission quality checker for government applications across India**
+**Pre-submission copilot for UMANG — your government application quality checker**
 
-Preflight catches completeness and consistency problems in applications **before** they reach the department. It explains issues in plain language and produces a clean "ready" packet — never claiming official verification; final authority stays with the department.
+Citizens applying for government services face a painful cycle: gather documents, submit online, wait for review, get rejected for a missing name mismatch or expired certificate, then repeat. Preflight catches these errors **before** submission, explains issues in plain language, and guides citizens through fixing them.
+
+Built for [Build What Moves India](https://buildwhatmovesindia.com/brief) hackathon.
 
 ---
+
+## What It Does
+
+```
+Tell Preflight what you need
+        ↓
+Bring the documents you already have
+        ↓
+AI reads and extracts information
+        ↓
+Deterministic rules find problems
+        ↓
+Plain-language explanations + fixes
+        ↓
+Re-check → Ready to continue
+```
+
+**Demo login:** Enter any 10-digit phone number + any 6-digit code (e.g., 123456).
+
+**Try the demo:** Click "Try 2-minute demo" on the dashboard.
 
 ## Architecture
 
@@ -19,11 +41,9 @@ Rule Pack (JSON — verified for Rajasthan, auto-generated for all other states)
         ↓
 Preflight Evaluation (pure function — 9 check implementations)
         ↓
-Fix Plan (AI resolution, canned mock fallback)
+Fix Plan (AI resolution in plain language)
         ↓
-Re-check (operator marks resolved, re-runs checks)
-        ↓
-Reviewer Gateway (read-only evidence trail)
+Re-check → Ready to continue
 ```
 
 ## Tech Stack
@@ -42,7 +62,14 @@ Reviewer Gateway (read-only evidence trail)
 
 ## Getting Started
 
-### Prerequisites
+### Quick Start (Demo)
+
+1. Visit the deployed app
+2. Enter any phone number + any 6-digit OTP
+3. Click "Try 2-minute demo"
+4. Walk through: Documents → Checks → Fix → Ready
+
+### Local Development
 
 - Node.js 18+
 - A [Neon](https://console.neon.tech) Postgres database
@@ -101,13 +128,13 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Route | Description |
 |---|---|
-| `/` | Landing page — Hero, How It Works, Features, FAQ, Footer |
-| `/dashboard` | Application list with status badges |
-| `/applications/new` | Step 1: select state + service, enter applicant + family member info |
-| `/applications/[id]/documents` | Step 2: upload mock documents per member |
-| `/applications/[id]/checks` | Step 3: run preflight checks, view AI resolution guidance, resolve blockers |
-| `/applications/[id]/packet` | Step 4: review packet summary, mock submit |
-| `/reviewer-gateway/[id]` | Prototype reviewer view — read-only audit evidence trail |
+| `/` | Landing — UMANG copilot positioning, flow visual, OpenAI badge |
+| `/dashboard` | Application list with "Your next action" card, UMANG context |
+| `/applications/new` | Intent-first wizard: What do you need? → State → Details → Family → Review |
+| `/applications/[id]/documents` | "Bring your existing documents" — readiness summary, sample docs, OpenAI Vision |
+| `/applications/[id]/checks` | Preflight results — claim/evidence/rule/result, AI-generated fixes |
+| `/applications/[id]/packet` | Application packet — review & mock submit |
+| `/reviewer-gateway/[id]` | Prototype reviewer view — read-only audit trail |
 
 ## API Routes
 
@@ -256,3 +283,15 @@ All 36 states and union territories are seeded with 17 services each (612 total)
 ## License
 
 Hackathon prototype — not for production use.
+
+Independent hackathon prototype — not affiliated with any government body.
+
+---
+
+## Submission
+
+**Project:** Preflight — Pre-submission copilot for UMANG
+**Hackathon:** [Build What Moves India](https://buildwhatmovesindia.com/brief)
+**Demo:** [Live link](https://preflight-tosif121s-projects.vercel.app/)
+**Login:** Any phone number + any 6-digit code
+**Summary + Video script:** See [SUBMISSION.md](./SUBMISSION.md)
