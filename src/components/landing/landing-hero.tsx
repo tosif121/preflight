@@ -73,10 +73,6 @@ export default function LandingHero() {
             </Button>
           </div>
 
-          <p className="text-xs text-[#B0ACA8] mb-8">
-            Demo: enter any phone number and any 6-digit code to sign in.
-          </p>
-
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-xs text-[#7A7771]">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#FCF8F4] border border-[#EAE5DC]">
               <Sparkles size={11} className="text-[#C85A40]" />
